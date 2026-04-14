@@ -8,9 +8,15 @@ public class ProjectRepository(AppDbContext context) : IProjectRepository
 {
     private readonly AppDbContext _context = context;
 
-    public async Task<List<Project>> GetAllAsync() => await _context.Projects.ToListAsync();
+    public async Task<List<Project>> GetAllAsync() =>
+        await _context.Projects
+            .Include(project => project.Assets)
+            .ToListAsync();
 
-    public async Task<Project?> GetByIdAsync(string id) => await _context.Projects.FindAsync(id);
+    public async Task<Project?> GetByIdAsync(string id) =>
+        await _context.Projects
+            .Include(project => project.Assets)
+            .FirstOrDefaultAsync(p => p.Id == id);
 
     public async Task AddAsync(Project project) => await _context.Projects.AddAsync(project);
 

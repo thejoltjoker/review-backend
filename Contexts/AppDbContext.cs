@@ -5,6 +5,15 @@ namespace Review.Api.Contexts;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
+    private static readonly DateTime SeedCreatedAt = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+    private const string Asset1Id = "ASSET000-0000-0000-0000-000000000001";
+    private const string Asset2Id = "ASSET000-0000-0000-0000-000000000002";
+    private const string Comment1Id = "COMMENT0-0000-0000-0000-000000000001";
+    private const string Comment2Id = "COMMENT0-0000-0000-0000-000000000002";
+    private const string Project1Id = "PROJECT0-0000-0000-0000-000000000001";
+    private const string Project2Id = "PROJECT0-0000-0000-0000-000000000002";
+
     public DbSet<ApiKey> ApiKeys { get; set; }
     public DbSet<Asset> Assets { get; set; }
     public DbSet<Comment> Comments { get; set; }
@@ -12,6 +21,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+
         // User relations
         // modelBuilder.Entity<User>()
         //     .HasOne(e => e.ApiKey)
@@ -38,5 +49,64 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         //     .WithOne(e => e.Project)
         //     .HasForeignKey(e => e.ProjectId)
         //     .IsRequired(false);
+
+        // Seed data
+        // TODO add users to projects
+        modelBuilder.Entity<Project>().HasData([
+            new()
+            {
+                Id = Project1Id,
+                Name = "The Code Awakens",
+                CreatedAt = SeedCreatedAt
+            },
+            new()
+            {
+                Id = Project2Id,
+                Name = "Ctrl+Alt+Delight",
+                CreatedAt = SeedCreatedAt
+            }
+        ]);
+
+        // TODO add users to assets
+        modelBuilder.Entity<Asset>().HasData([
+            new()
+            {
+                Id = Asset1Id,
+                FileName = "kickoff-notes.mp4",
+                FileUrl = "https://cdn.review.local/assets/kickoff-notes.mp4",
+                FileType = "video/mp4",
+                CreatedAt = SeedCreatedAt,
+                ProjectId = Project1Id
+            },
+            new()
+            {
+                Id = Asset2Id,
+                FileName = "retro-summary.pdf",
+                FileUrl = "https://cdn.review.local/assets/retro-summary.pdf",
+                FileType = "application/pdf",
+                CreatedAt = SeedCreatedAt,
+                ProjectId = Project2Id
+            }
+        ]);
+
+        // TODO add users to comments
+        modelBuilder.Entity<Comment>().HasData([
+            new()
+            {
+                Id = Comment1Id,
+                Content = "Great onboarding section, very clear.",
+                TimestampSeconds = 18.5f,
+                CreatedAt = SeedCreatedAt,
+                AssetId = Asset1Id
+            },
+            new()
+            {
+                Id = Comment2Id,
+                Content = "Please add a short decision summary at the end.",
+                TimestampSeconds = 0f,
+                CreatedAt = SeedCreatedAt,
+                AssetId = Asset2Id
+            }
+        ]);
     }
 }
