@@ -9,7 +9,7 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Initialize new solution.
+- Initialize new repo and add user authentication and authorization.
   [#1](https://github.com/Medieinstitutet/ykweb25v1-the-assignment-thejoltjoker/pull/1)
 
 ### Changed
