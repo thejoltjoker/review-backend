@@ -10,5 +10,6 @@ public class User : IdentityUser
     
     public ICollection<Asset> Assets { get; } = new List<Asset>(); // Collection navigation containing dependents
 
+    public ICollection<Comment> Comments { get; } = new List<Comment>(); // Collection navigation containing dependents
 
 }
