@@ -29,10 +29,12 @@ public class ProjectService : IProjectService
         return _mapper.Map<ProjectWithAssetsDto>(result);
     }
 
-    public async Task<ProjectDto> CreateAsync(CreateProjectDto data)
+    public async Task<ProjectDto> CreateAsync(string userId, CreateProjectDto data)
     {
         // TODO validate data
-        var project = _mapper.Map<Project>(data);
+        // var project = _mapper.Map<Project>(data);
+        // project.AddUser(userId, ProjectUserRole.Creator);
+        var project = Project.Create(data.Name, userId);
         var result = await _repository.AddAsync(project);
         await _repository.SaveAsync();
         return _mapper.Map<ProjectDto>(result);

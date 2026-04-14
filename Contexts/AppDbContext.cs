@@ -19,6 +19,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Asset> Assets { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Project> Projects { get; set; }
+    public DbSet<ProjectUser> ProjectUsers { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,10 +30,25 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         //     .WithOne(e => e.User)
         //     .HasForeignKey<ApiKey>(e => e.UserId)
         //     .IsRequired();
-        modelBuilder.Entity<User>()
-            .HasMany(e => e.Projects)
-            .WithMany(e => e.Users)
-            .UsingEntity<ProjectUser>();
+        modelBuilder.Entity<ProjectUser>()
+            .HasKey(pt => new { pt.ProjectId, pt.UserId });
+
+        modelBuilder.Entity<ProjectUser>()
+            .HasOne(pt => pt.Project)
+            .WithMany(p => p.ProjectUsers)
+            .HasForeignKey(pt => pt.ProjectId);
+
+        modelBuilder.Entity<ProjectUser>()
+            .HasOne(pt => pt.User)
+            .WithMany(t => t.ProjectUsers)
+            .HasForeignKey(pt => pt.UserId);
+
+        modelBuilder.Entity<ProjectUser>()
+            .Property(pt => pt.Role)
+            .HasDefaultValue(ProjectUserRole.Viewer);
+        // (
+        //     r => r.HasOne<Project>().WithMany().HasForeignKey(e => e.UserId),
+        //     l => l.HasOne<User>().WithMany().HasForeignKey(e => e.ProjectId));
         // modelBuilder.Entity<User>()
         //     .HasMany(e => e.Assets)
         //     .WithOne(e => e.User)
@@ -53,13 +70,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         // Seed data
         // TODO add users to projects
         modelBuilder.Entity<Project>().HasData([
-            new("The Code Awakens", UserId)
+            new()
             {
+                Name = "The Code Awakens",
                 Id = Project1Id,
                 CreatedAt = SeedCreatedAt
             },
-            new("Ctrl+Alt+Delight", UserId)
+            new()
             {
+                Name = "Ctrl+Alt+Delight",
                 Id = Project2Id,
                 CreatedAt = SeedCreatedAt
             }
