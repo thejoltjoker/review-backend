@@ -31,21 +31,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         //     .HasForeignKey<ApiKey>(e => e.UserId)
         //     .IsRequired();
         modelBuilder.Entity<ProjectUser>()
-            .HasKey(pt => new { pt.ProjectId, pt.UserId });
+            .HasKey(pu => new { pu.ProjectId, pu.UserId });
 
         modelBuilder.Entity<ProjectUser>()
-            .HasOne(pt => pt.Project)
+            .HasOne(pu => pu.Project)
             .WithMany(p => p.ProjectUsers)
-            .HasForeignKey(pt => pt.ProjectId);
+            .HasForeignKey(pu => pu.ProjectId);
 
         modelBuilder.Entity<ProjectUser>()
-            .HasOne(pt => pt.User)
+            .HasOne(pu => pu.User)
             .WithMany(t => t.ProjectUsers)
-            .HasForeignKey(pt => pt.UserId);
+            .HasForeignKey(pu => pu.UserId);
 
-        modelBuilder.Entity<ProjectUser>()
-            .Property(pt => pt.Role)
-            .HasDefaultValue(ProjectUserRole.Viewer);
+        
         // (
         //     r => r.HasOne<Project>().WithMany().HasForeignKey(e => e.UserId),
         //     l => l.HasOne<User>().WithMany().HasForeignKey(e => e.ProjectId));

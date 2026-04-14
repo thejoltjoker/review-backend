@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Review.Api.Models;
 using Review.Api.Models.DTOs;
@@ -8,9 +10,17 @@ namespace Review.Api.Controllers;
 // TODO add authorization
 [ApiController]
 [Route("[controller]")]
-public class ProjectsController(IProjectService service) : ControllerBase
+[Authorize]
+public class ProjectsController : ControllerBase
 {
-    private readonly IProjectService _service = service;
+    private readonly IProjectService _service;
+    private readonly UserManager<User> _userManager;
+
+    public ProjectsController(UserManager<User> userManager, IProjectService service)
+    {
+        _service = service;
+        _userManager = userManager;
+    }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Project>>> GetAll()
@@ -18,6 +28,8 @@ public class ProjectsController(IProjectService service) : ControllerBase
         // TODO implement global exception handler
         try
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+            
             var result = await _service.GetAllAsync();
             return Ok(result);
         }
@@ -51,7 +63,7 @@ public class ProjectsController(IProjectService service) : ControllerBase
     {
         // TODO implement global exception handler
         // TODO validate data
-        
+
         try
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
@@ -66,7 +78,7 @@ public class ProjectsController(IProjectService service) : ControllerBase
             return Problem(e.Message);
         }
     }
-    
+
     [HttpPut]
     [Route("{id}")]
     public async Task<ActionResult> Update(string id, Project project)

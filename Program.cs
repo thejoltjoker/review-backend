@@ -14,6 +14,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddAutoMapper(options => { options.AddMaps(typeof(Program)); });
 
 const string databaseName = "ReviewDatabase";
+
 builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(databaseName));
 builder.Services.AddDbContext<IdentityContext>(options => options.UseInMemoryDatabase(databaseName));
 
@@ -57,6 +58,7 @@ using (var scope = app.Services.CreateScope())
 
     var identityContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
     identityContext.Database.EnsureCreated();
+
 
     // TODO remove before deployment
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
