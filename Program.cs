@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Review.Api;
 using Review.Api.Contexts;
 using Review.Api.Models;
 using Review.Api.Repositories;
