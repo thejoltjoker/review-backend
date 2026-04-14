@@ -1,6 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Identity;
-using Review.Api.Contexts;
 using Review.Api.Models;
 using Review.Api.Models.DTOs;
 using Review.Api.Repositories;
@@ -18,8 +16,8 @@ public class ProjectService : IProjectService
     public ProjectService(IProjectRepository projectRepository, IUserRepository userRepository, IMapper mapper)
     {
         _projectRepository = projectRepository;
-        _mapper = mapper;
         _userRepository = userRepository;
+        _mapper = mapper;
     }
 
     public async Task<IEnumerable<ProjectDto>> GetAllAsync()

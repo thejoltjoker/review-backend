@@ -23,7 +23,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Project>>> GetAll()
+    public async Task<ActionResult<IEnumerable<ProjectDto>>> GetAll()
     {
         // TODO implement global exception handler
         try

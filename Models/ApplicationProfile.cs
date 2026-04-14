@@ -10,5 +10,6 @@ public class ApplicationProfile : Profile
         CreateMap<Project, ProjectDto>();
         CreateMap<Project, ProjectWithAssetsDto>();
         CreateMap<CreateProjectDto, Project>();
+        CreateMap<Asset, AssetDto>();
     }
 }
