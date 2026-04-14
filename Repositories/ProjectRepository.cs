@@ -18,7 +18,11 @@ public class ProjectRepository(AppDbContext context) : IProjectRepository
             .Include(project => project.Assets)
             .FirstOrDefaultAsync(p => p.Id == id);
 
-    public async Task AddAsync(Project project) => await _context.Projects.AddAsync(project);
+    public async Task<Project> AddAsync(Project project)
+    {
+        await _context.Projects.AddAsync(project);
+        return project;
+    }
 
     public void Update(Project project) => _context.Projects.Update(project);
 

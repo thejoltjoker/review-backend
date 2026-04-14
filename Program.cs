@@ -11,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 
+builder.Services.AddAutoMapper(options => { options.AddMaps(typeof(Program)); });
+
 const string databaseName = "ReviewDatabase";
 builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(databaseName));
 builder.Services.AddDbContext<IdentityContext>(options => options.UseInMemoryDatabase(databaseName));

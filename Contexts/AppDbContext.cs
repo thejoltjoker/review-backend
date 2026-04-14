@@ -7,6 +7,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     private static readonly DateTime SeedCreatedAt = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+    private const string UserId = "USER0-0000-0000-0000-000000000001";
     private const string Asset1Id = "ASSET000-0000-0000-0000-000000000001";
     private const string Asset2Id = "ASSET000-0000-0000-0000-000000000002";
     private const string Comment1Id = "COMMENT0-0000-0000-0000-000000000001";
@@ -21,17 +22,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
-
         // User relations
         // modelBuilder.Entity<User>()
         //     .HasOne(e => e.ApiKey)
         //     .WithOne(e => e.User)
         //     .HasForeignKey<ApiKey>(e => e.UserId)
         //     .IsRequired();
-        // modelBuilder.Entity<User>()
-        //     .HasMany(e => e.Projects)
-        //     .WithMany(e => e.Users);
+        modelBuilder.Entity<User>()
+            .HasMany(e => e.Projects)
+            .WithMany(e => e.Users)
+            .UsingEntity<ProjectUser>();
         // modelBuilder.Entity<User>()
         //     .HasMany(e => e.Assets)
         //     .WithOne(e => e.User)
@@ -53,16 +53,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         // Seed data
         // TODO add users to projects
         modelBuilder.Entity<Project>().HasData([
-            new()
+            new("The Code Awakens", UserId)
             {
                 Id = Project1Id,
-                Name = "The Code Awakens",
                 CreatedAt = SeedCreatedAt
             },
-            new()
+            new("Ctrl+Alt+Delight", UserId)
             {
                 Id = Project2Id,
-                Name = "Ctrl+Alt+Delight",
                 CreatedAt = SeedCreatedAt
             }
         ]);

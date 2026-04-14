@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Review.Api.Models;
+using Review.Api.Models.DTOs;
 using Review.Api.Services;
 
 namespace Review.Api.Controllers;
@@ -17,7 +18,7 @@ public class ProjectsController(IProjectService service) : ControllerBase
         // TODO implement global exception handler
         try
         {
-            IEnumerable<Project> result = await _service.GetAllAsync();
+            var result = await _service.GetAllAsync();
             return Ok(result);
         }
         catch (Exception e)
@@ -29,12 +30,12 @@ public class ProjectsController(IProjectService service) : ControllerBase
 
     [HttpGet]
     [Route("{id}")]
-    public async Task<ActionResult<Project>> GetById(string id)
+    public async Task<ActionResult<ProjectWithAssetsDto>> GetById(string id)
     {
         // TODO implement global exception handler
         try
         {
-            Project? result = await _service.GetByIdAsync(id);
+            ProjectWithAssetsDto? result = await _service.GetByIdAsync(id);
             if (result == null) return NotFound($"Project {id} not found");
             return Ok(result);
         }
@@ -46,16 +47,18 @@ public class ProjectsController(IProjectService service) : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Project>> Create(Project project)
+    public async Task<ActionResult<Project>> Create([FromBody] CreateProjectDto data)
     {
         // TODO implement global exception handler
         // TODO validate data
+        
         try
         {
-            var result = await _service.CreateAsync(project);
+            if (!ModelState.IsValid) return ValidationProblem(ModelState);
+            var result = await _service.CreateAsync(data);
             // if (result == null) return BadRequest("Project couldn't be created");
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, project);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
         catch (Exception e)
         {

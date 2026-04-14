@@ -6,7 +6,7 @@ public interface IProjectRepository
 {
     Task<List<Project>> GetAllAsync();
     Task<Project?> GetByIdAsync(string id);
-    Task AddAsync(Project project);
+    Task<Project> AddAsync(Project project);
     void Update(Project project);
     void Delete(Project project);
     Task SaveAsync();

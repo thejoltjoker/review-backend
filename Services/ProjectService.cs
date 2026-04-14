@@ -1,28 +1,47 @@
+using AutoMapper;
 using Review.Api.Models;
+using Review.Api.Models.DTOs;
 using Review.Api.Repositories;
 
 namespace Review.Api.Services;
 
-public class ProjectService(IProjectRepository repository) : IProjectService
+public class ProjectService : IProjectService
 {
-    private readonly IProjectRepository _repository = repository;
+    private readonly IProjectRepository _repository;
+    private readonly IMapper _mapper;
 
-    public async Task<List<Project>> GetAllAsync() => await _repository.GetAllAsync();
+    public ProjectService(IProjectRepository repository, IMapper mapper)
+    {
+        _repository = repository;
+        _mapper = mapper;
+    }
 
-    public async Task<Project?> GetByIdAsync(string id) => await _repository.GetByIdAsync(id);
+    public async Task<IEnumerable<ProjectDto>> GetAllAsync()
+    {
+        var result = await _repository.GetAllAsync();
+        return _mapper.Map<IEnumerable<ProjectDto>>(result);
+    }
 
-    public async Task<Project> CreateAsync(Project project)
+    public async Task<ProjectWithAssetsDto?> GetByIdAsync(string id)
+    {
+        var result = await _repository.GetByIdAsync(id);
+        if (result == null) return null;
+        return _mapper.Map<ProjectWithAssetsDto>(result);
+    }
+
+    public async Task<ProjectDto> CreateAsync(CreateProjectDto data)
     {
         // TODO validate data
-        await _repository.AddAsync(project);
+        var project = _mapper.Map<Project>(data);
+        var result = await _repository.AddAsync(project);
         await _repository.SaveAsync();
-        return project;
+        return _mapper.Map<ProjectDto>(result);
     }
 
     public async Task<bool> UpdateAsync(string id, Project project)
     {
         // TODO validate data
-        var existing = await GetByIdAsync(id);
+        var existing = await _repository.GetByIdAsync(id);
         if (existing == null) return false;
         existing.Name = project.Name;
         existing.CreatedAt = project.CreatedAt;
@@ -33,7 +52,7 @@ public class ProjectService(IProjectRepository repository) : IProjectService
 
     public async Task<bool> DeleteAsync(string id)
     {
-        var project = await GetByIdAsync(id);
+        var project = await _repository.GetByIdAsync(id);
         if (project == null) return false;
         _repository.Delete(project);
         await _repository.SaveAsync();
