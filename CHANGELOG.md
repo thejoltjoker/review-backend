@@ -9,7 +9,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- <!-- New features -->
+- Initialize new solution.
+  [#1](https://github.com/Medieinstitutet/ykweb25v1-the-assignment-thejoltjoker/pull/1)
 
 ### Changed
 
