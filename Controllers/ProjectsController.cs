@@ -67,7 +67,9 @@ public class ProjectsController : ControllerBase
         try
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
-            var result = await _service.CreateAsync("USER0-0000-0000-0000-000000000001", data);
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return Unauthorized();
+            var result = await _service.CreateAsync(currentUser.Id, data);
             // if (result == null) return BadRequest("Project couldn't be created");
 
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);

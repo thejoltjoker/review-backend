@@ -19,7 +19,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Asset> Assets { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Project> Projects { get; set; }
-    public DbSet<ProjectUser> ProjectUsers { get; set; }
+    public DbSet<User> Users { get; set; }
+    
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,20 +31,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         //     .WithOne(e => e.User)
         //     .HasForeignKey<ApiKey>(e => e.UserId)
         //     .IsRequired();
-        modelBuilder.Entity<ProjectUser>()
-            .HasKey(pu => new { pu.ProjectId, pu.UserId });
 
-        modelBuilder.Entity<ProjectUser>()
-            .HasOne(pu => pu.Project)
-            .WithMany(p => p.ProjectUsers)
-            .HasForeignKey(pu => pu.ProjectId);
 
-        modelBuilder.Entity<ProjectUser>()
-            .HasOne(pu => pu.User)
-            .WithMany(t => t.ProjectUsers)
-            .HasForeignKey(pu => pu.UserId);
-
-        
         // (
         //     r => r.HasOne<Project>().WithMany().HasForeignKey(e => e.UserId),
         //     l => l.HasOne<User>().WithMany().HasForeignKey(e => e.ProjectId));
