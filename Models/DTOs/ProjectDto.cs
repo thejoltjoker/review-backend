@@ -22,4 +22,5 @@ public class ProjectWithAssetsDto
     public string Name { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public List<AssetDto> Assets { get; set; } = [];
+    public List<UserDto> Users { get; set; } = [];
 }

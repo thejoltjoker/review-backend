@@ -22,12 +22,14 @@ public class ProjectService : IProjectService
 
     public async Task<IEnumerable<ProjectDto>> GetAllAsync()
     {
+        // TODO Scope results to the authenticated API-key owner instead of returning all projects.
         var result = await _projectRepository.GetAllAsync();
         return _mapper.Map<IEnumerable<ProjectDto>>(result);
     }
 
     public async Task<ProjectWithAssetsDto?> GetByIdAsync(string id)
     {
+        // TODO Verify project ownership for the authenticated API-key owner before returning protected data.
         var result = await _projectRepository.GetByIdAsync(id);
         if (result == null) return null;
         return _mapper.Map<ProjectWithAssetsDto>(result);
@@ -52,6 +54,7 @@ public class ProjectService : IProjectService
     public async Task<bool> UpdateAsync(string id, Project project)
     {
         // TODO validate data
+        // TODO Enforce that only the owner tied to the validated API key can update this project.
         var existing = await _projectRepository.GetByIdAsync(id);
         if (existing == null) return false;
         existing.Name = project.Name;
@@ -63,6 +66,7 @@ public class ProjectService : IProjectService
 
     public async Task<bool> DeleteAsync(string id)
     {
+        // TODO Enforce that only the owner tied to the validated API key can delete this project.
         var project = await _projectRepository.GetByIdAsync(id);
         if (project == null) return false;
         _projectRepository.Delete(project);

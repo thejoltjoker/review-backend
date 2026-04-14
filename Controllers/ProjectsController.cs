@@ -7,7 +7,7 @@ using Review.Api.Services;
 
 namespace Review.Api.Controllers;
 
-// TODO add authorization
+// TODO Add API-key based authorization for all project CRUD endpoints
 [ApiController]
 [Route("[controller]")]
 [Authorize]
@@ -25,6 +25,7 @@ public class ProjectsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectDto>>> GetAll()
     {
+        // TODO Validate incoming API key before returning project data.
         // TODO implement global exception handler
         try
         {
@@ -44,6 +45,7 @@ public class ProjectsController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult<ProjectWithAssetsDto>> GetById(string id)
     {
+        // TODO Validate incoming API key before returning project details.
         // TODO implement global exception handler
         try
         {
@@ -61,6 +63,7 @@ public class ProjectsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Project>> Create([FromBody] CreateProjectDto data)
     {
+        // TODO Validate incoming API key before creating a project
         // TODO implement global exception handler
         // TODO validate data
 
@@ -85,6 +88,7 @@ public class ProjectsController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> Update(string id, Project project)
     {
+        // TODO Validate incoming API key before updating a project.
         // TODO implement global exception handler
         // TODO validate data
         try
@@ -104,6 +108,7 @@ public class ProjectsController : ControllerBase
     [Route("{id}")]
     public async Task<ActionResult> Delete(string id)
     {
+        // TODO Validate incoming API key before deleting a project.
         // TODO implement global exception handler
         try
         {

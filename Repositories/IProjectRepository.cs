@@ -5,6 +5,7 @@ namespace Review.Api.Repositories;
 public interface IProjectRepository
 {
     Task<List<Project>> GetAllAsync();
+    Task<List<Project>> GetAllByUserIdAsync(string userId);
     Task<Project?> GetByIdAsync(string id);
     Task<Project> AddAsync(Project project);
     void Update(Project project);

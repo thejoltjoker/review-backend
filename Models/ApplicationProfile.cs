@@ -11,5 +11,6 @@ public class ApplicationProfile : Profile
         CreateMap<Project, ProjectWithAssetsDto>();
         CreateMap<CreateProjectDto, Project>();
         CreateMap<Asset, AssetDto>();
+        CreateMap<User, UserDto>();
     }
 }

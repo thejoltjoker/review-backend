@@ -6,16 +6,28 @@ namespace Review.Api.Repositories;
 
 public class ProjectRepository(AppDbContext context) : IProjectRepository
 {
+    // TODO Use user-scoped queries for protected CRUD so API-key owners only access their own resource data.
     private readonly AppDbContext _context = context;
 
-    public async Task<List<Project>> GetAllAsync() =>
-        await _context.Projects
+    public async Task<List<Project>> GetAllAsync()
+    {
+        return await _context.Projects
             .Include(project => project.Assets)
             .ToListAsync();
+    }
+
+    public async Task<List<Project>> GetAllByUserIdAsync(string userId)
+    {
+        return await _context.Projects
+            .Where(p => p.Users.Any(u => u.Id == userId))
+            .Include(project => project.Assets)
+            .ToListAsync();
+    }
 
     public async Task<Project?> GetByIdAsync(string id) =>
         await _context.Projects
             .Include(project => project.Assets)
+            .Include(project => project.Users)
             .FirstOrDefaultAsync(p => p.Id == id);
 
     public async Task<Project> AddAsync(Project project)
