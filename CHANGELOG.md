@@ -1,0 +1,33 @@
+# Changelog
+
+All notable changes to this project should be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project follows [Semantic Versioning](https://semver.org/).
+
+## [Unreleased]
+
+### Added
+
+- Initialize new solution.
+  [#1](https://github.com/Medieinstitutet/ykweb25v1-the-assignment-thejoltjoker/pull/1)
+
+### Changed
+
+- <!-- Changes in existing functionality -->
+
+### Deprecated
+
+- <!-- Soon-to-be removed features -->
+
+### Removed
+
+- <!-- Removed features -->
+
+### Fixed
+
+- <!-- Bug fixes -->
+
+### Security
+
+- <!-- Vulnerability fixes -->
