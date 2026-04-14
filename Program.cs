@@ -29,7 +29,7 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
         options.Password.RequireUppercase = false;
     }
     // TODO set owasp password standards
-    
+
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<IdentityContext>();
 
@@ -44,6 +44,29 @@ using (var scope = app.Services.CreateScope())
 
     var identityContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
     identityContext.Database.EnsureCreated();
+
+    // TODO remove before deployment
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    string email = builder.Configuration["SeedUser:Email"]!;
+    string password = builder.Configuration["SeedUser:Password"]!;
+
+    var existingUser = userManager.FindByEmailAsync(email);
+    if (existingUser.Result == null)
+    {
+        User user = new User
+        {
+            UserName = email,
+            Email = email,
+            EmailConfirmed = true,
+        };
+        var result = await userManager.CreateAsync(user, password);
+        if (!result.Succeeded)
+        {
+            throw new Exception(
+                $"Failed to seed {email}:{password} | {string.Join(", ", result.Errors.Select(e => e.Description))}"
+            );
+        }
+    }
 }
 
 // Configure the HTTP request pipeline.
@@ -57,6 +80,7 @@ if (app.Environment.IsDevelopment())
         options.RoutePrefix = string.Empty;
     });
 }
+
 app.UseHttpsRedirection();
 
 app.MapIdentityApi<User>();

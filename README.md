@@ -23,7 +23,7 @@ Detta projekt är startpunkten för din inlämingsuppgift. Ni behöver skapa ett
 #### API-nyckel
 
 - [ ] Efter registrering och inloggning ska användaren kunna begära en API-nyckel.
-- [ ] API-nyckeln ska sparas i databasen och kopplas till användaren.
+- [x] API-nyckeln ska sparas i databasen och kopplas till användaren.
 
 #### Skyddade API-slutpunkter med CRUD-funktionalitet
 

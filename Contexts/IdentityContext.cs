@@ -4,4 +4,7 @@ using Review.Api.Models;
 
 namespace Review.Api.Contexts;
 
-public class IdentityContext(DbContextOptions options) : IdentityDbContext<User>(options);
+public class IdentityContext(DbContextOptions options) : IdentityDbContext<User>(options)
+{
+    
+};
