@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "K3YGHuO8Zjc=",
+  "dgSpecHash": "pbAsFxj3/rI=",
   "success": true,
-  "projectFilePath": "/Users/johannes/dev/ykweb25v1-the-assignment-thejoltjoker/Review.Api.csproj",
+  "projectFilePath": "/Users/johannes/dev/review-backend/Review.Api.csproj",
   "expectedPackageFiles": [
     "/Users/johannes/.nuget/packages/automapper/16.1.1/automapper.16.1.1.nupkg.sha512",
     "/Users/johannes/.nuget/packages/microsoft.aspnetcore.identity.entityframeworkcore/10.0.5/microsoft.aspnetcore.identity.entityframeworkcore.10.0.5.nupkg.sha512",
@@ -10,12 +10,18 @@
     "/Users/johannes/.nuget/packages/microsoft.entityframeworkcore/10.0.5/microsoft.entityframeworkcore.10.0.5.nupkg.sha512",
     "/Users/johannes/.nuget/packages/microsoft.entityframeworkcore.abstractions/10.0.5/microsoft.entityframeworkcore.abstractions.10.0.5.nupkg.sha512",
     "/Users/johannes/.nuget/packages/microsoft.entityframeworkcore.analyzers/10.0.5/microsoft.entityframeworkcore.analyzers.10.0.5.nupkg.sha512",
+    "/Users/johannes/.nuget/packages/microsoft.entityframeworkcore.inmemory/10.0.5/microsoft.entityframeworkcore.inmemory.10.0.5.nupkg.sha512",
     "/Users/johannes/.nuget/packages/microsoft.entityframeworkcore.relational/10.0.5/microsoft.entityframeworkcore.relational.10.0.5.nupkg.sha512",
+    "/Users/johannes/.nuget/packages/microsoft.extensions.apidescription.server/10.0.0/microsoft.extensions.apidescription.server.10.0.0.nupkg.sha512",
     "/Users/johannes/.nuget/packages/microsoft.identitymodel.abstractions/8.14.0/microsoft.identitymodel.abstractions.8.14.0.nupkg.sha512",
     "/Users/johannes/.nuget/packages/microsoft.identitymodel.jsonwebtokens/8.14.0/microsoft.identitymodel.jsonwebtokens.8.14.0.nupkg.sha512",
     "/Users/johannes/.nuget/packages/microsoft.identitymodel.logging/8.14.0/microsoft.identitymodel.logging.8.14.0.nupkg.sha512",
     "/Users/johannes/.nuget/packages/microsoft.identitymodel.tokens/8.14.0/microsoft.identitymodel.tokens.8.14.0.nupkg.sha512",
-    "/Users/johannes/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+    "/Users/johannes/.nuget/packages/microsoft.openapi/2.4.1/microsoft.openapi.2.4.1.nupkg.sha512",
+    "/Users/johannes/.nuget/packages/swashbuckle.aspnetcore/10.1.7/swashbuckle.aspnetcore.10.1.7.nupkg.sha512",
+    "/Users/johannes/.nuget/packages/swashbuckle.aspnetcore.swagger/10.1.7/swashbuckle.aspnetcore.swagger.10.1.7.nupkg.sha512",
+    "/Users/johannes/.nuget/packages/swashbuckle.aspnetcore.swaggergen/10.1.7/swashbuckle.aspnetcore.swaggergen.10.1.7.nupkg.sha512",
+    "/Users/johannes/.nuget/packages/swashbuckle.aspnetcore.swaggerui/10.1.7/swashbuckle.aspnetcore.swaggerui.10.1.7.nupkg.sha512"
   ],
   "logs": []
 }
