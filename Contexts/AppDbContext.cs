@@ -6,6 +6,9 @@ namespace Review.Api.Contexts;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<ApiKey> ApiKeys { get; set; }
+    public DbSet<Asset> Assets { get; set; }
+    public DbSet<Comment> Comments { get; set; }
+    public DbSet<Project> Projects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
