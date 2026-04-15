@@ -14,6 +14,7 @@ builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IApiKeySecretHasher, ApiKeySecretHasher>();
 
 builder.Services.AddAutoMapper(options =>
 {

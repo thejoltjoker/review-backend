@@ -15,3 +15,9 @@ public class CreateApiKeyDto
 {
     public string? Name { get; set; } = null;
 }
+
+public class ApiKeyCreatedDto(string token, string? name)
+{
+    public string Token { get; set; } = token;
+    public string? Name { get; set; } = name;
+}
