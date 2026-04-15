@@ -9,6 +9,8 @@ using Review.Api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
+builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 
@@ -51,7 +53,25 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthentication().AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("ApiKey",
+    options =>
+    {
+        options.DisplayMessage = "Api key test";
+    });
+
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiKeyOrUser", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.AddAuthenticationSchemes(
+            "ApiKey",
+            IdentityConstants.BearerScheme // "Identity.Bearer"
+            // optionally also IdentityConstants.ApplicationScheme for cookie auth
+        );
+    });
+});
 
 var app = builder.Build();
 
