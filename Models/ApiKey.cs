@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+using Review.Api.Services;
 
 namespace Review.Api.Models;
 
@@ -15,7 +15,7 @@ public class ApiKey
     public string? Name { get; set; }
 
     // TODO Hash key instead of storing plain text
-    public string Value { get; set; } = GenerateApiKey();
+    public string Value { get; set; } = ApiKeyGenerator.GenerateApiKey();
     public DateTime CreatedAt { get; set; }
     public DateTime? ExpiresAt { get; set; }
     public DateTime? RevokedAt { get; set; }
@@ -23,16 +23,4 @@ public class ApiKey
     public string UserId { get; set; }
     public User User { get; set; } = null!;
     // TODO implement createdAt and updatedAt
-    
-    
-    
-
-    public static string GenerateApiKey(int length = 32)
-    {
-        using var generator = RandomNumberGenerator.Create();
-        byte[] bytes = new byte[length];
-        generator.GetBytes(bytes);
-
-        return BitConverter.ToString(bytes).Replace("-", "").ToLower();
-    }
 }
