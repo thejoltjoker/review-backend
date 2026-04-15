@@ -9,3 +9,8 @@ public class ApiKeyDto
     public DateTime? RevokedAt { get; set; }
     public string UserId { get; set; }
 }
+
+public class CreateApiKeyDto
+{
+    public string? Name { get; set; } = null;
+}

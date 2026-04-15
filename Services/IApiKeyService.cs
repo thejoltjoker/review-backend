@@ -5,5 +5,6 @@ namespace Review.Api.Services;
 
 public interface IApiKeyService
 {
-    Task<ApiKeyDto> CreateAsync(string userId);
+    Task<IEnumerable<ApiKeyDto>> GetAllAsync(string userId);
+    Task<ApiKeyDto> CreateAsync(string userId, string? name);
 }

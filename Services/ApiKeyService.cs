@@ -16,10 +16,16 @@ public class ApiKeyService : IApiKeyService
         _mapper = mapper;
     }
 
-    public async Task<ApiKeyDto> CreateAsync(string userId)
+    public async Task<IEnumerable<ApiKeyDto>> GetAllAsync(string userId)
+    {
+        var result = await _apiKeyRepository.GetAllByUserIdAsync(userId);
+        return _mapper.Map<IEnumerable<ApiKeyDto>>(result);
+    }
+
+    public async Task<ApiKeyDto> CreateAsync(string userId, string? name)
     {
         // TODO allow user to pick a name
-        var newKey = new ApiKey(userId, "");
+        var newKey = new ApiKey(userId, name);
         var result = await _apiKeyRepository.AddAsync(newKey);
         await _apiKeyRepository.SaveAsync();
         return _mapper.Map<ApiKeyDto>(result);

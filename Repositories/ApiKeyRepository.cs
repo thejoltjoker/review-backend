@@ -25,6 +25,14 @@ public class ApiKeyRepository : IApiKeyRepository
         return await _context.ApiKeys.Where(apiKey => apiKey.UserId == userId).ToListAsync();
     }
 
+    public async Task<ApiKey?> GetByValueAsync(string value)
+    {
+        return await _context.ApiKeys
+            .Include(apiKey => apiKey.User)
+            .Where(apiKey => apiKey.Value == value)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<ApiKey> AddAsync(ApiKey apiKey)
     {
         await _context.ApiKeys.AddAsync(apiKey);
