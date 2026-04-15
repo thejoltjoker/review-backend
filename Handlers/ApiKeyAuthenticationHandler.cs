@@ -1,5 +1,5 @@
+using System.Net.Http.Headers;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -19,14 +19,18 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.ContainsKey(HeaderNames.Authorization))
-        {
+        if (!Request.Headers.TryGetValue(HeaderNames.Authorization, out var raw))
             return Task.FromResult(AuthenticateResult.NoResult());
-        }
 
-        
-        string authHeader = Request.Headers[HeaderNames.Authorization];
-        string apiKey = authHeader.Split(" ")[1];
+        if (!AuthenticationHeaderValue.TryParse(raw, out var header))
+            return Task.FromResult(AuthenticateResult.NoResult());
+
+        if (!string.Equals(header.Scheme, ApiKeyConstants.ApiKeyAuthorizationScheme, StringComparison.OrdinalIgnoreCase))
+            return Task.FromResult(AuthenticateResult.NoResult());
+
+        var apiKey = header.Parameter;
+        if (string.IsNullOrWhiteSpace(apiKey))
+            return Task.FromResult(AuthenticateResult.Fail("Missing API key."));
         
         if (_keys.Contains(apiKey))
         {
@@ -37,7 +41,7 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
             };
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
-            var ticket = new AuthenticationTicket(principal, "Api Key");
+            var ticket = new AuthenticationTicket(principal, ApiKeyConstants.ApiKeyName);
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
         

@@ -53,7 +53,7 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthentication().AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("ApiKey",
+builder.Services.AddAuthentication().AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.ApiKeyName,
     options =>
     {
         options.DisplayMessage = "Api key test";
@@ -66,9 +66,8 @@ builder.Services.AddAuthorization(options =>
     {
         policy.RequireAuthenticatedUser();
         policy.AddAuthenticationSchemes(
-            "ApiKey",
-            IdentityConstants.BearerScheme // "Identity.Bearer"
-            // optionally also IdentityConstants.ApplicationScheme for cookie auth
+            ApiKeyConstants.ApiKeyName,
+            IdentityConstants.BearerScheme
         );
     });
 });
