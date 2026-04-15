@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Review.Api.Services;
 
 namespace Review.Api.Models;
@@ -18,6 +20,7 @@ public class ApiKey
 
     // TODO Hash key instead of storing plain text
     public string Value { get; set; } = ApiKeyGenerator.GenerateApiKey();
+    // TODO Constrain unique
     public string KeyId { get; set; }
     public string KeyHash { get; set; }
 

@@ -3,16 +3,19 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Review.Api.Contexts;
 using Review.Api.Models;
 using Review.Api.Models.DTOs;
+using Review.Api.Services;
 
 namespace Review.Api.Repositories;
 
 public class ApiKeyRepository : IApiKeyRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly IApiKeySecretHasher _hasher;
 
-    public ApiKeyRepository(ApplicationDbContext context)
+    public ApiKeyRepository(ApplicationDbContext context, IApiKeySecretHasher hasher)
     {
         _context = context;
+        _hasher = hasher;
     }
 
     public async Task<List<ApiKey>> GetAllAsync()
@@ -30,6 +33,27 @@ public class ApiKeyRepository : IApiKeyRepository
         return await _context.ApiKeys
             .Include(apiKey => apiKey.User)
             .Where(apiKey => apiKey.Value == value)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<ApiKey?> GetByTokenAsync(string token)
+    {
+        string[] parts = token.Split(".");
+        if (parts.Length != 2) throw new Exception("Invalid token");
+        if (!parts[0].StartsWith("ak_")) throw new Exception("Invalid token");
+        string keyId = parts[0];
+
+        return await _context.ApiKeys
+            .Include(apiKey => apiKey.User)
+            .Where(apiKey => apiKey.KeyId == keyId)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<ApiKey?> GetByKeyId(string keyId)
+    {
+        return await _context.ApiKeys
+            .Include(apiKey => apiKey.User)
+            .Where(apiKey => apiKey.KeyId == keyId)
             .FirstOrDefaultAsync();
     }
 

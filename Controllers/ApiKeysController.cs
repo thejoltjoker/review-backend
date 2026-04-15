@@ -50,7 +50,7 @@ public class ApiKeysController : ControllerBase
             // if (result == null) return BadRequest("Project couldn't be created");
 
             // TODO Verify key is only visible once after creation.
-            return CreatedAtAction(nameof(GetAll), result);
+            return Created(string.Empty, result);
         }
         catch (Exception e)
         {
