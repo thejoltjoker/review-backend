@@ -7,9 +7,11 @@ using Microsoft.Net.Http.Headers;
 using Review.Api.Models;
 using Review.Api.Repositories;
 
+namespace Review.Api.Handlers;
+
 public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
 {
-    private IApiKeyRepository _repository;
+    private readonly IApiKeyRepository _repository;
 
     public ApiKeyAuthenticationHandler(
         IApiKeyRepository repository,
@@ -42,14 +44,16 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
 
         if (result.ExpiresAt.HasValue && result.ExpiresAt.Value < DateTime.UtcNow)
             return await Task.FromResult(AuthenticateResult.Fail("API key expired"));
-            
-        if (result.RevokedAt.HasValue && result.RevokedAt.Value > DateTime.UtcNow)
+
+        if (result.RevokedAt.HasValue)
             return await Task.FromResult(AuthenticateResult.Fail("API key revoked"));
+    
 
 
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, apiKey)
+            // TODO Do not expose the API key as a claim, change to a non-secret identifier i.e. id/name.
+            new Claim(ClaimTypes.Name, apiKey),
             new Claim(ClaimTypes.NameIdentifier, result.UserId)
         };
         var identity = new ClaimsIdentity(claims, Scheme.Name);

@@ -8,6 +8,7 @@ namespace Review.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+// Only bearer tokens for key management
 [Authorize]
 public class ApiKeysController : ControllerBase
 {
@@ -41,13 +42,15 @@ public class ApiKeysController : ControllerBase
     {
         try
         {
+            // TODO Improve error handling
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             var result = await _service.CreateAsync(userId, data.Name);
             // if (result == null) return BadRequest("Project couldn't be created");
 
-            return Created();
+            // TODO Verify key is only visible once after creation.
+            return CreatedAtAction(nameof(GetAll), result);
         }
         catch (Exception e)
         {

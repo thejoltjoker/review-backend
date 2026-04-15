@@ -23,6 +23,9 @@ public class ApiKey
     public string UserId { get; set; }
     public User User { get; set; } = null!;
     // TODO implement createdAt and updatedAt
+    
+    
+    
 
     public static string GenerateApiKey(int length = 32)
     {
