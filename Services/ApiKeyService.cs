@@ -24,7 +24,7 @@ public class ApiKeyService : IApiKeyService
 
     public async Task<ApiKeyDto> CreateAsync(string userId, string? name)
     {
-        // TODO allow user to pick a name
+        // TODO Invalidate old api key when new is created
         var newKey = new ApiKey(userId, name);
         var result = await _apiKeyRepository.AddAsync(newKey);
         await _apiKeyRepository.SaveAsync();

@@ -11,7 +11,8 @@ namespace Review.Api.Controllers;
 // TODO Add API-key based authorization for all project CRUD endpoints
 [ApiController]
 [Route("[controller]")]
-[Authorize]
+[Authorize(Policy = "ApiKeyOrUser")]
+// TODO get user id from api key i.e. NameIdentifier
 public class ProjectsController : ControllerBase
 {
     private readonly IProjectService _service;

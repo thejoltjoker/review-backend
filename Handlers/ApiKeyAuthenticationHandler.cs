@@ -9,7 +9,6 @@ using Review.Api.Repositories;
 
 public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthenticationOptions>
 {
-    private string[] _keys = ["test-api-key"];
     private IApiKeyRepository _repository;
 
     public ApiKeyAuthenticationHandler(
@@ -41,11 +40,17 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
         var result = await _repository.GetByValueAsync(apiKey);
         if (result == null) return await Task.FromResult(AuthenticateResult.Fail("Invalid API key"));
 
+        if (result.ExpiresAt.HasValue && result.ExpiresAt.Value < DateTime.UtcNow)
+            return await Task.FromResult(AuthenticateResult.Fail("API key expired"));
+            
+        if (result.RevokedAt.HasValue && result.RevokedAt.Value > DateTime.UtcNow)
+            return await Task.FromResult(AuthenticateResult.Fail("API key revoked"));
+
 
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, apiKey)
-            // TODO add user info  
+            new Claim(ClaimTypes.NameIdentifier, result.UserId)
         };
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);
