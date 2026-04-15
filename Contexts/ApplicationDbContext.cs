@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Review.Api.Models;
 
 namespace Review.Api.Contexts;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<User>(options)
 {
     private static readonly DateTime SeedCreatedAt = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -20,13 +21,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Project> Projects { get; set; }
     public DbSet<User> Users { get; set; }
-    
 
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
+        base.OnModelCreating(builder);
+        
         // User relations
-        // modelBuilder.Entity<User>()
+        // builder.Entity<User>()
         //     .HasOne(e => e.ApiKey)
         //     .WithOne(e => e.User)
         //     .HasForeignKey<ApiKey>(e => e.UserId)
@@ -36,19 +38,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         // (
         //     r => r.HasOne<Project>().WithMany().HasForeignKey(e => e.UserId),
         //     l => l.HasOne<User>().WithMany().HasForeignKey(e => e.ProjectId));
-        // modelBuilder.Entity<User>()
+        // builder.Entity<User>()
         //     .HasMany(e => e.Assets)
         //     .WithOne(e => e.User)
         //     .HasForeignKey(e => e.UserId)
         //     .IsRequired(false);
-        // modelBuilder.Entity<User>()
+        // builder.Entity<User>()
         //     .HasMany(e => e.Comments)
         //     .WithOne(e => e.User)
         //     .HasForeignKey(e => e.UserId)
         //     .IsRequired(false);
 
         // Project relations
-        // modelBuilder.Entity<Project>()
+        // builder.Entity<Project>()
         //     .HasMany(e => e.Assets)
         //     .WithOne(e => e.Project)
         //     .HasForeignKey(e => e.ProjectId)
@@ -56,7 +58,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         // Seed data
         // TODO add users to projects
-        modelBuilder.Entity<Project>().HasData([
+        builder.Entity<Project>().HasData([
             new()
             {
                 Name = "The Code Awakens",
@@ -72,7 +74,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         ]);
 
         // TODO add users to assets
-        modelBuilder.Entity<Asset>().HasData([
+        builder.Entity<Asset>().HasData([
             new()
             {
                 Id = Asset1Id,
@@ -94,7 +96,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         ]);
 
         // TODO add users to comments
-        modelBuilder.Entity<Comment>().HasData([
+        builder.Entity<Comment>().HasData([
             new()
             {
                 Id = Comment1Id,

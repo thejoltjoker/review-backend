@@ -5,9 +5,9 @@ namespace Review.Api.Services;
 
 public interface IProjectService
 {
-    Task<IEnumerable<ProjectDto>> GetAllAsync();
-    Task<ProjectWithAssetsDto?> GetByIdAsync(string id);
+    Task<IEnumerable<ProjectDto>> GetAllAsync(string userId);
+    Task<ProjectWithAssetsDto?> GetByIdAsync(string userId, string projectId);
     Task<ProjectDto> CreateAsync(string userId, CreateProjectDto data);
-    Task<bool> UpdateAsync(string id, Project project);
-    Task<bool> DeleteAsync(string id);
+    Task<bool> UpdateAsync(string userId, string projectId, Project project);
+    Task<bool> DeleteAsync(string userId, string projectId);
 }

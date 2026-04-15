@@ -4,10 +4,10 @@ using Review.Api.Models;
 
 namespace Review.Api.Repositories;
 
-public class ProjectRepository(AppDbContext context) : IProjectRepository
+public class ProjectRepository(ApplicationDbContext context) : IProjectRepository
 {
     // TODO Use user-scoped queries for protected CRUD so API-key owners only access their own resource data.
-    private readonly AppDbContext _context = context;
+    private readonly ApplicationDbContext _context = context;
 
     public async Task<List<Project>> GetAllAsync()
     {
@@ -24,11 +24,20 @@ public class ProjectRepository(AppDbContext context) : IProjectRepository
             .ToListAsync();
     }
 
-    public async Task<Project?> GetByIdAsync(string id) =>
+    public async Task<Project?> GetByIdAsync(string projectId) =>
         await _context.Projects
             .Include(project => project.Assets)
             .Include(project => project.Users)
-            .FirstOrDefaultAsync(p => p.Id == id);
+            .FirstOrDefaultAsync(p => p.Id == projectId);
+
+    public async Task<Project?> GetByIdForUserAsync(string userId, string projectId)
+    {
+        return await _context.Projects
+            .Where(p => p.Users.Any(u => u.Id == userId))
+            .Include(project => project.Assets)
+            .Include(project => project.Users)
+            .FirstOrDefaultAsync(p => p.Id == projectId);
+    }
 
     public async Task<Project> AddAsync(Project project)
     {

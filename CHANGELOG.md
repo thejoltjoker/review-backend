@@ -10,9 +10,11 @@ and this project follows [Semantic Versioning](https://semver.org/).
 ### Added
 
 - Initialize new repo and add user authentication and authorization.
-  [#1](https://github.com/Medieinstitutet/review-backend/pull/1)
+  [#1](https://github.com/thejoltjoker/review-backend/pull/1)
 - Add models for assets, projects, comments and users.
-  [#2](https://github.com/Medieinstitutet/review-backend/pull/2)
+  [#2](https://github.com/thejoltjoker/review-backend/pull/2)
+- Implement CRUD functionality for `Project` entity
+  [#3](https://github.com/thejoltjoker/review-backend/pull/3)
 
 ### Changed
 
