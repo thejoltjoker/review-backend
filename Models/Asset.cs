@@ -15,5 +15,4 @@ public class Asset
     public User? User { get; set; }
     
     public ICollection<Comment> Comments { get; } = new List<Comment>(); // Collection navigation containing dependents
-
 }
