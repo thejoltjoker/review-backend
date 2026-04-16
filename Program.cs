@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Review.Api.Contexts;
 using Review.Api.Handlers;
-using Review.Api.Middleware;
 using Review.Api.Models;
 using Review.Api.Repositories;
 using Review.Api.Services;
@@ -17,6 +16,7 @@ builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IApiKeySecretHasher, ApiKeySecretHasher>();
 
+
 builder.Services.AddAutoMapper(options =>
 {
     options.LicenseKey = builder.Configuration["AutoMapper:ApiKey"];
@@ -24,15 +24,14 @@ builder.Services.AddAutoMapper(options =>
 });
 
 const string databaseName = "ReviewDatabase";
-
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase(databaseName));
 
-// Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
+builder.Services.AddProblemDetails();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -83,6 +82,7 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -126,13 +126,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
-
-app.MapIdentityApi<User>();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.MapIdentityApi<User>();
 app.MapControllers();
 
 app.Run();

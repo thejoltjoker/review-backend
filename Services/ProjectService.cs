@@ -36,10 +36,10 @@ public class ProjectService : IProjectService
 
     public async Task<ProjectDto> CreateAsync(string userId, CreateProjectDto data)
     {
-        // TODO validate data
         var project = _mapper.Map<Project>(data);
         var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null) throw new Exception("User not found");
+        // TODO Use a custom exception that maps to 404
+        if (user == null) throw new KeyNotFoundException("User not found");
         if (project.Users.All(u => u.Id != user.Id))
         {
             project.Users.Add(user);
