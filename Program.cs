@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Review.Api.Contexts;
 using Review.Api.Handlers;
+using Review.Api.Middleware;
 using Review.Api.Models;
 using Review.Api.Repositories;
 using Review.Api.Services;
@@ -132,6 +133,7 @@ app.UseHttpsRedirection();
 app.MapIdentityApi<User>();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 

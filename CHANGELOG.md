@@ -17,6 +17,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#3](https://github.com/thejoltjoker/review-backend/pull/3)
 - Implement API key authentication and authorization.
   [#4](https://github.com/thejoltjoker/review-backend/pull/4)
+- Add simple global exception handler middleware
+  [#6](https://github.com/thejoltjoker/review-backend/pull/6)
 
 ### Changed
 
