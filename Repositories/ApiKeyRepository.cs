@@ -28,19 +28,12 @@ public class ApiKeyRepository : IApiKeyRepository
         return await _context.ApiKeys.Where(apiKey => apiKey.UserId == userId).ToListAsync();
     }
 
-    public async Task<ApiKey?> GetByValueAsync(string value)
-    {
-        return await _context.ApiKeys
-            .Include(apiKey => apiKey.User)
-            .Where(apiKey => apiKey.Value == value)
-            .FirstOrDefaultAsync();
-    }
-
     public async Task<ApiKey?> GetByTokenAsync(string token)
     {
+        // TODO Improve token parsing
         string[] parts = token.Split(".");
-        if (parts.Length != 2) throw new Exception("Invalid token");
-        if (!parts[0].StartsWith("ak_")) throw new Exception("Invalid token");
+        if (parts.Length != 2) return null;
+        if (!parts[0].StartsWith("ak_")) return null;
         string keyId = parts[0];
 
         return await _context.ApiKeys

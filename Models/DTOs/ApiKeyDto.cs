@@ -3,8 +3,7 @@ namespace Review.Api.Models.DTOs;
 public class ApiKeyDto
 {
     public string? Name { get; set; } = null;
-    // TODO Do not store plaintext keys, only return key once at creation
-    public string Value { get; set; } = string.Empty; 
+    public string KeyId { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? ExpiresAt { get; set; }
     public DateTime? RevokedAt { get; set; }

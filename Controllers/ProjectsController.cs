@@ -8,11 +8,9 @@ using Review.Api.Services;
 
 namespace Review.Api.Controllers;
 
-// TODO Add API-key based authorization for all project CRUD endpoints
 [ApiController]
 [Route("[controller]")]
 [Authorize(Policy = "ApiKeyOrUser")]
-// TODO get user id from api key i.e. NameIdentifier
 public class ProjectsController : ControllerBase
 {
     private readonly IProjectService _service;
@@ -45,7 +43,6 @@ public class ProjectsController : ControllerBase
     [Route("{projectId}")]
     public async Task<ActionResult<ProjectWithAssetsDto>> GetById(string projectId)
     {
-        // TODO Validate incoming API key before returning project details.
         // TODO implement global exception handler
         try
         {

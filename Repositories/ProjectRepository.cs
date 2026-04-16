@@ -6,7 +6,6 @@ namespace Review.Api.Repositories;
 
 public class ProjectRepository(ApplicationDbContext context) : IProjectRepository
 {
-    // TODO Use user-scoped queries for protected CRUD so API-key owners only access their own resource data.
     private readonly ApplicationDbContext _context = context;
 
     public async Task<List<Project>> GetAllAsync()

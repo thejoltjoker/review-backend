@@ -43,6 +43,8 @@ public class ApiKeysController : ControllerBase
         try
         {
             // TODO Improve error handling
+            // TODO Set expiration
+            // TODO Revoke all other api keys
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
