@@ -14,10 +14,12 @@ namespace Review.Api.Controllers;
 public class ProjectsController : ControllerBase
 {
     private readonly IProjectService _service;
+    private readonly ILogger<ProjectsController> _logger;
 
-    public ProjectsController(IProjectService service)
+    public ProjectsController(IProjectService service, ILogger<ProjectsController> logger)
     {
         _service = service;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -34,7 +36,7 @@ public class ProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error while fetching all projects");
             return Problem("Something went wrong");
         }
     }
@@ -54,7 +56,7 @@ public class ProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error while fetching project {ProjectId}", projectId);
             return Problem("Something went wrong");
         }
     }
@@ -77,7 +79,7 @@ public class ProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error while creating project");
             return Problem("Something went wrong");
         }
     }
@@ -98,7 +100,7 @@ public class ProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error while updating project {ProjectId}", projectId);
             return Problem("Something went wrong");
         }
     }
@@ -118,7 +120,7 @@ public class ProjectsController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error while deleting project {ProjectId}", projectId);
             return Problem("Something went wrong");
         }
     }

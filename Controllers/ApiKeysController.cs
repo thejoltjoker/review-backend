@@ -14,10 +14,12 @@ namespace Review.Api.Controllers;
 public class ApiKeysController : ControllerBase
 {
     private readonly IApiKeyService _service;
+    private readonly ILogger<ApiKeysController> _logger;
 
-    public ApiKeysController(IApiKeyService service)
+    public ApiKeysController(IApiKeyService service, ILogger<ApiKeysController> logger)
     {
         _service = service;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -34,7 +36,7 @@ public class ApiKeysController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error while fetching ApiKeys");
             return Problem("Something went wrong");
         }
     }
@@ -58,7 +60,7 @@ public class ApiKeysController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error while creating ApiKey");
 
             return Problem("Something went wrong");
         }
@@ -79,7 +81,7 @@ public class ApiKeysController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Error while revoking ApiKey {KeyId}", keyId);
             return Problem("Something went wrong");
         }
     }
