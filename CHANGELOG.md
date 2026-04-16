@@ -15,6 +15,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#2](https://github.com/thejoltjoker/review-backend/pull/2)
 - Implement CRUD functionality for `Project` entity
   [#3](https://github.com/thejoltjoker/review-backend/pull/3)
+- Implement API key authentication and authorization.
+  [#4](https://github.com/thejoltjoker/review-backend/pull/4)
 
 ### Changed
 

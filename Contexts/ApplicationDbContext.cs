@@ -26,7 +26,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        
+
         // User relations
         // builder.Entity<User>()
         //     .HasOne(e => e.ApiKey)
@@ -114,5 +114,48 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 AssetId = Asset2Id
             }
         ]);
+    }
+
+    private void SetTimestamps()
+    {
+        DateTime now = DateTime.UtcNow;
+
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedAt = now;
+                entry.Entity.UpdatedAt = now;
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.UpdatedAt = now;
+            }
+        }
+        
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedAt = now;
+                entry.Entity.UpdatedAt = now;
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.UpdatedAt = now;
+            }
+        }
+    }
+
+    public override int SaveChanges()
+    {
+        SetTimestamps();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        SetTimestamps();
+        return base.SaveChangesAsync(cancellationToken);
     }
 }

@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Review.Api.Contexts;
+using Review.Api.Handlers;
 using Review.Api.Models;
 using Review.Api.Repositories;
 using Review.Api.Services;
@@ -9,8 +10,11 @@ using Review.Api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
+builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IApiKeySecretHasher, ApiKeySecretHasher>();
 
 builder.Services.AddAutoMapper(options =>
 {
@@ -51,7 +55,24 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthentication().AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.ApiKeyName,
+    options =>
+    {
+        options.DisplayMessage = "Api key test";
+    });
+
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApiKeyOrUser", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.AddAuthenticationSchemes(
+            ApiKeyConstants.ApiKeyName,
+            IdentityConstants.BearerScheme
+        );
+    });
+});
 
 var app = builder.Build();
 

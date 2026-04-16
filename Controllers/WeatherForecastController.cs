@@ -5,7 +5,7 @@ namespace Review.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize]
+[Authorize(Policy = "ApiKeyOrUser")]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries =
