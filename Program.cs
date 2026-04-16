@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Review.Api;
 using Review.Api.Contexts;
+using Review.Api.Middleware;
 using Review.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -86,6 +86,7 @@ app.UseHttpsRedirection();
 app.MapIdentityApi<User>();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 
