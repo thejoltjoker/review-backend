@@ -24,18 +24,31 @@ public class ApiKeyService : IApiKeyService
         return _mapper.Map<IEnumerable<ApiKeyDto>>(result);
     }
 
-    public async Task<ApiKeyCreatedDto> CreateAsync(string userId, string? name)
+    public async Task<ApiKeyCreatedDto> CreateAsync(string userId, string? name,
+        DateTime? expiresAt = null)
     {
+        expiresAt ??= DateTime.UtcNow.AddDays(90);
         // TODO Invalidate old api key when new is created
         string keyId = ApiKeyGenerator.GenerateApiKeyId();
         string secret = ApiKeyGenerator.GenerateApiKey();
         string secretHash = _hasher.Hash(secret);
-        string token = $"{keyId}.{secret}";
+        string token = ApiKeyTokenParser.CreateToken(keyId, secret);
 
         ApiKey newKey = new ApiKey(userId: userId, keyHash: secretHash, keyId: keyId, name: name);
+        newKey.ExpiresAt = expiresAt;
         await _apiKeyRepository.AddAsync(newKey);
         await _apiKeyRepository.SaveAsync();
         ApiKeyCreatedDto response = new(token, name);
         return response;
+    }
+
+    public async Task<bool> RevokeAsync(string userId, string keyId)
+    {
+        var apiKey = await _apiKeyRepository.GetByKeyId(keyId);
+        if (apiKey == null) return false;
+        if (apiKey.UserId != userId) return false;
+        _apiKeyRepository.Revoke(apiKey);
+        await _apiKeyRepository.SaveAsync();
+        return true;
     }
 }

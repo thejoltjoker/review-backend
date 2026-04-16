@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Review.Api.Models.DTOs;
 using Review.Api.Services;
@@ -9,18 +10,20 @@ namespace Review.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 // Only bearer tokens for key management
-[Authorize]
+[Authorize(Policy = "BearerOnly")]
 public class ApiKeysController : ControllerBase
 {
     private readonly IApiKeyService _service;
+    private readonly ILogger<ApiKeysController> _logger;
 
-    public ApiKeysController(IApiKeyService service)
+    public ApiKeysController(IApiKeyService service, ILogger<ApiKeysController> logger)
     {
         _service = service;
+        _logger = logger;
     }
 
     [HttpGet]
-    public async Task<ActionResult<ApiKeyDto>> GetAll()
+    public async Task<ActionResult<IEnumerable<ApiKeyDto>>> GetAll()
     {
         try
         {
@@ -33,10 +36,11 @@ public class ApiKeysController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return Problem(e.Message);
+            _logger.LogError(e, "Error while fetching ApiKeys");
+            return Problem("Something went wrong");
         }
     }
+
     [HttpPost]
     public async Task<ActionResult<ApiKeyDto>> Create([FromBody] CreateApiKeyDto data)
     {
@@ -48,7 +52,7 @@ public class ApiKeysController : ControllerBase
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
-            var result = await _service.CreateAsync(userId, data.Name);
+            var result = await _service.CreateAsync(userId, data.Name, DateTime.UtcNow.AddDays(90));
             // if (result == null) return BadRequest("Project couldn't be created");
 
             // TODO Verify key is only visible once after creation.
@@ -56,8 +60,28 @@ public class ApiKeysController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            return Problem(e.Message);
+            _logger.LogError(e, "Error while creating ApiKey");
+            return Problem("Something went wrong");
+        }
+    }
+
+    [HttpDelete]
+    [Route("{keyId}")]
+    public async Task<ActionResult> Revoke(string keyId)
+    {
+        try
+        {
+            if (!ModelState.IsValid) return ValidationProblem(ModelState);
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+            var result = await _service.RevokeAsync(userId, keyId);
+            if (!result) return Problem("Couldn't revoke api key");
+            return NoContent();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error while revoking ApiKey {KeyId}", keyId);
+            return Problem("Something went wrong");
         }
     }
 }
