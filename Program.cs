@@ -56,11 +56,9 @@ builder.Services.AddIdentityApiEndpoints<User>(options =>
     options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthentication().AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(ApiKeyConstants.ApiKeyName,
-    options =>
-    {
-        options.DisplayMessage = "Api key test";
-    });
+builder.Services.AddAuthentication().AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
+    ApiKeyConstants.ApiKeyName,
+    options => { options.DisplayMessage = "Api key test"; });
 
 
 builder.Services.AddAuthorization(options =>

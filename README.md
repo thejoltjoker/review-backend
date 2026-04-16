@@ -27,13 +27,13 @@ Detta projekt är startpunkten för din inlämingsuppgift. Ni behöver skapa ett
 
 #### Skyddade API-slutpunkter med CRUD-funktionalitet
 
-- [ ] Du ska skapa minst en resurs (t.ex. recept, sportresultat, speldata, personliga anteckningar) som användaren kan hantera via CRUD:
-  - [ ] Create – Lägga till data.
-  - [ ] Read – Hämta data.
-  - [ ] Update – Ändra befintlig data.
-  - [ ] Delete – Ta bort data.
-- [ ] Alla CRUD-operationer ska kräva giltig API-nyckel.
-- [ ] API-nyckeln ska skickas med i anropet och valideras innan data returneras eller ändras.
+- [x] Du ska skapa minst en resurs (t.ex. recept, sportresultat, speldata, personliga anteckningar) som användaren kan hantera via CRUD:
+  - [x] Create – Lägga till data.
+  - [x] Read – Hämta data.
+  - [x] Update – Ändra befintlig data.
+  - [x] Delete – Ta bort data.
+- [x] Alla CRUD-operationer ska kräva giltig API-nyckel.
+- [x] API-nyckeln ska skickas med i anropet och valideras innan data returneras eller ändras.
 
 #### Databas
 
@@ -46,12 +46,12 @@ Denna uppgift bedöms med IG (icke godkänd), G (godkänd) och VG (Väl Godkänt
 
 ##### För godkänt (G) krävs:
 
-- [ ] Användare kan registrera sig och logga in.
-- [ ] Användare kan begära och få en API-nyckel.
-- [ ] CRUD-funktionalitet finns för vald resurs och är skyddad med API-nyckel.
-- [ ] API-nyckeln valideras korrekt vid varje anrop.
+- [x] Användare kan registrera sig och logga in.
+- [x] Användare kan begära och få en API-nyckel.
+- [x] CRUD-funktionalitet finns för vald resurs och är skyddad med API-nyckel.
+- [x] API-nyckeln valideras korrekt vid varje anrop.
 - [ ] Databasen fungerar enligt vald lösning (SQL med EF).
-- [ ] Ni använder kontroller som endpoints och hanterar logiken i dessa.
+- [x] Ni använder kontroller som endpoints och hanterar logiken i dessa.
 - [ ] Korrekta svarskoder skickas från ditt API.
 
 ##### För Väl godkänt (VG) krävs:

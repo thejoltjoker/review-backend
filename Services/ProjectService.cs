@@ -50,13 +50,11 @@ public class ProjectService : IProjectService
         return _mapper.Map<ProjectDto>(result);
     }
 
-    public async Task<bool> UpdateAsync(string userId, string projectId, Project project)
+    public async Task<bool> UpdateAsync(string userId, string projectId, UpdateProjectDto data)
     {
-        // TODO validate data
         var existing = await _projectRepository.GetByIdForUserAsync(userId, projectId);
         if (existing == null) return false;
-        existing.Name = project.Name;
-        existing.CreatedAt = project.CreatedAt;
+        existing.Name = data.Name;
         _projectRepository.Update(existing);
         await _projectRepository.SaveAsync();
         return true;

@@ -86,16 +86,17 @@ public class ProjectsController : ControllerBase
 
     [HttpPut]
     [Route("{projectId}")]
-    public async Task<ActionResult> Update(string projectId, Project project)
+    public async Task<ActionResult> Update(string projectId, [FromBody] UpdateProjectDto data)
     {
         // TODO implement global exception handler
-        // TODO validate data
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
         try
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
-            var result = await _service.UpdateAsync(userId, projectId, project);
-            if (!result) return BadRequest($"Couldn't update project {projectId}");
+            
+            var result = await _service.UpdateAsync(userId, projectId, data);
+            if (!result) return NotFound($"Project {projectId} not found");
             return NoContent();
         }
         catch (Exception e)

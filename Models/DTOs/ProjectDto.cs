@@ -8,6 +8,11 @@ public class CreateProjectDto
     [StringLength(128, MinimumLength = 2)]
     public string Name { get; set; } = string.Empty;
 }
+public class UpdateProjectDto
+{
+    [StringLength(128, MinimumLength = 2)]
+    public string Name { get; set; } = string.Empty;
+}
 
 public class ProjectDto
 {
