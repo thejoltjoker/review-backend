@@ -20,7 +20,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- <!-- Changes in existing functionality -->
+- Improve API key implementation
+  [#5](https://github.com/thejoltjoker/review-backend/pull/5)
 
 ### Deprecated
 
