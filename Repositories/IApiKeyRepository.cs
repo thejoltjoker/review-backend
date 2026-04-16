@@ -10,5 +10,6 @@ public interface IApiKeyRepository
     Task<ApiKey?> GetByTokenAsync(string token);
     Task<ApiKey?> GetByKeyId(string keyId);
     Task<ApiKey> AddAsync(ApiKey apiKey);
+    void Revoke(ApiKey apiKey);
     Task SaveAsync();
 }

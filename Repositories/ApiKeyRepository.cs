@@ -30,11 +30,8 @@ public class ApiKeyRepository : IApiKeyRepository
 
     public async Task<ApiKey?> GetByTokenAsync(string token)
     {
-        // TODO Improve token parsing
-        string[] parts = token.Split(".");
-        if (parts.Length != 2) return null;
-        if (!parts[0].StartsWith("ak_")) return null;
-        string keyId = parts[0];
+        ApiKeyTokenParser.ParseToken(token, out var keyId, out var secret);
+        if (string.IsNullOrEmpty(keyId)) return null;
 
         return await _context.ApiKeys
             .Include(apiKey => apiKey.User)
@@ -54,6 +51,11 @@ public class ApiKeyRepository : IApiKeyRepository
     {
         await _context.ApiKeys.AddAsync(apiKey);
         return apiKey;
+    }
+
+    public void Revoke(ApiKey apiKey)
+    {
+        apiKey.RevokedAt = DateTime.UtcNow;
     }
 
     public Task SaveAsync()

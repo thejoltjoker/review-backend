@@ -56,7 +56,7 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<ApiKeyAuthentic
         string keyId = parts[0];
         string secret = parts[1];
 
-        var result = await _repository.GetByTokenAsync(token);
+        var result = await _repository.GetByKeyId(keyId);
         if (result == null) return await Task.FromResult(AuthenticateResult.Fail("Invalid API token"));
         var verificationResult = _hasher.Verify(result.KeyHash, secret);
         if (verificationResult == PasswordVerificationResult.Failed)
