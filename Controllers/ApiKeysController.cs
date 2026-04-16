@@ -61,7 +61,6 @@ public class ApiKeysController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, "Error while creating ApiKey");
-
             return Problem("Something went wrong");
         }
     }
