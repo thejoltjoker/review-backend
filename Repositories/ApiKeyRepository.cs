@@ -1,0 +1,48 @@
+using Microsoft.EntityFrameworkCore;
+using Review.Api.Contexts;
+using Review.Api.Models;
+
+namespace Review.Api.Repositories;
+
+public class ApiKeyRepository : IApiKeyRepository
+{
+    private readonly ApplicationDbContext _context;
+
+    public ApiKeyRepository(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<List<ApiKey>> GetAllAsync()
+    {
+        return await _context.ApiKeys.ToListAsync();
+    }
+
+    public async Task<List<ApiKey>> GetAllByUserIdAsync(string userId)
+    {
+        return await _context.ApiKeys.Where(apiKey => apiKey.UserId == userId).ToListAsync();
+    }
+
+    public async Task<ApiKey?> GetByKeyId(string keyId)
+    {
+        return await _context.ApiKeys
+            .Where(apiKey => apiKey.KeyId == keyId)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<ApiKey> AddAsync(ApiKey apiKey)
+    {
+        await _context.ApiKeys.AddAsync(apiKey);
+        return apiKey;
+    }
+
+    public void Revoke(ApiKey apiKey)
+    {
+        apiKey.RevokedAt = DateTime.UtcNow;
+    }
+
+    public Task SaveAsync()
+    {
+        return _context.SaveChangesAsync();
+    }
+}

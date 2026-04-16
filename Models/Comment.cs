@@ -1,12 +1,10 @@
 namespace Review.Api.Models;
 
-public class Comment
+public class Comment : BaseEntity
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
 
     public string Content { get; set; }
     public float TimestampSeconds { get; set; }
-    public DateTime CreatedAt { get; set; }
 
     public string? AssetId { get; set; }
     public Asset? Asset { get; set; }
