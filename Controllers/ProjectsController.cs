@@ -35,7 +35,7 @@ public class ProjectsController : ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Problem(e.Message);
+            return Problem("Something went wrong");
         }
     }
 
@@ -55,7 +55,7 @@ public class ProjectsController : ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Problem(e.Message);
+            return Problem("Something went wrong");
         }
     }
 
@@ -78,7 +78,7 @@ public class ProjectsController : ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Problem(e.Message);
+            return Problem("Something went wrong");
         }
     }
 
@@ -99,7 +99,7 @@ public class ProjectsController : ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Problem(e.Message);
+            return Problem("Something went wrong");
         }
     }
 
@@ -119,7 +119,7 @@ public class ProjectsController : ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Problem(e.Message);
+            return Problem("Something went wrong");
         }
     }
 }

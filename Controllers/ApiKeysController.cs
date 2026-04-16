@@ -10,7 +10,7 @@ namespace Review.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 // Only bearer tokens for key management
-[Authorize(AuthenticationSchemes = IdentityConstants.BearerScheme)]
+[Authorize(Policy = "BearerOnly")]
 public class ApiKeysController : ControllerBase
 {
     private readonly IApiKeyService _service;
@@ -35,7 +35,7 @@ public class ApiKeysController : ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Problem(e.Message);
+            return Problem("Something went wrong");
         }
     }
 
@@ -59,7 +59,8 @@ public class ApiKeysController : ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Problem(e.Message);
+
+            return Problem("Something went wrong");
         }
     }
 
@@ -79,7 +80,7 @@ public class ApiKeysController : ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Problem(e.Message);
+            return Problem("Something went wrong");
         }
     }
 }

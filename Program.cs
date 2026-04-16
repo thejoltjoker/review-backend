@@ -64,6 +64,14 @@ builder.Services.AddAuthentication().AddScheme<ApiKeyAuthenticationOptions, ApiK
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("BearerOnly", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.AddAuthenticationSchemes(
+            IdentityConstants.BearerScheme
+        );
+    });
+
     options.AddPolicy("ApiKeyOrUser", policy =>
     {
         policy.RequireAuthenticatedUser();
