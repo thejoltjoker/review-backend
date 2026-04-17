@@ -85,6 +85,7 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    const string userId = "USER0-0000-0000-0000-000000000001";
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     context.Database.EnsureCreated();
 
@@ -94,12 +95,12 @@ using (var scope = app.Services.CreateScope())
     string email = builder.Configuration["SeedUser:Email"]!;
     string password = builder.Configuration["SeedUser:Password"]!;
 
-    var existingUser = userManager.FindByEmailAsync(email);
-    if (existingUser.Result == null)
+    User? seededUser = await userManager.FindByEmailAsync(email);
+    if (seededUser == null)
     {
         User user = new User
         {
-            Id = "USER0-0000-0000-0000-000000000001",
+            Id = userId,
             UserName = email,
             Email = email,
             EmailConfirmed = true,
@@ -111,7 +112,102 @@ using (var scope = app.Services.CreateScope())
                 $"Failed to seed {email}:{password} | {string.Join(", ", result.Errors.Select(e => e.Description))}"
             );
         }
+
+        seededUser = user;
     }
+    
+    
+    // Seed at runtime instead of HasData to be able to make relationship to user
+    DateTime seedCreatedAt = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    const string asset1Id = "ASSET000-0000-0000-0000-000000000001";
+    const string asset2Id = "ASSET000-0000-0000-0000-000000000002";
+    const string comment1Id = "COMMENT0-0000-0000-0000-000000000001";
+    const string comment2Id = "COMMENT0-0000-0000-0000-000000000002";
+    const string project1Id = "PROJECT0-0000-0000-0000-000000000001";
+    const string project2Id = "PROJECT0-0000-0000-0000-000000000002";
+    
+    if (!await context.Projects.AnyAsync(p => p.Id == project1Id))
+    {
+        context.Projects.Add(new Project("The Code Awakens")
+        {
+            Id = project1Id,
+            CreatedAt = seedCreatedAt
+        });
+    }
+    if (!await context.Projects.AnyAsync(p => p.Id == project2Id))
+    {
+        context.Projects.Add(new Project("Ctrl+Alt+Delight")
+        {
+            Id = project2Id,
+            CreatedAt = seedCreatedAt
+        });
+    }
+
+    await context.SaveChangesAsync();
+
+    var project1 = await context.Projects.FirstAsync(p => p.Id == project1Id);
+    if (project1.Users.All(u => u.Id != seededUser.Id))
+    {
+        project1.Users.Add(seededUser);
+    }
+    var project2 = await context.Projects.FirstAsync(p => p.Id == project2Id);
+    if (project2.Users.All(u => u.Id != seededUser.Id))
+    {
+        project2.Users.Add(seededUser);
+    }
+    
+    if (!await context.Assets.AnyAsync(a => a.Id == asset1Id))
+    {
+        context.Assets.Add(new Asset
+        {
+            Id = asset1Id,
+            FileName = "kickoff-notes.mp4",
+            FileUrl = "https://cdn.review.local/assets/kickoff-notes.mp4",
+            FileType = "video/mp4",
+            ProjectId = project1Id,
+            UserId = seededUser.Id,
+            CreatedAt = seedCreatedAt
+        });
+    }
+    if (!await context.Assets.AnyAsync(a => a.Id == asset2Id))
+    {
+        context.Assets.Add(new Asset
+        {
+            Id = asset2Id,
+            FileName = "retro-summary.pdf",
+            FileUrl = "https://cdn.review.local/assets/retro-summary.pdf",
+            FileType = "application/pdf",
+            ProjectId = project2Id,
+            UserId = seededUser.Id,
+            CreatedAt = seedCreatedAt
+        });
+    }
+    if (!await context.Comments.AnyAsync(c => c.Id == comment1Id))
+    {
+        context.Comments.Add(new Comment
+        {
+            Id = comment1Id,
+            Content = "Great onboarding section, very clear.",
+            TimestampSeconds = 18.5f,
+            AssetId = asset1Id,
+            UserId = seededUser.Id,
+            CreatedAt = seedCreatedAt
+        });
+    }
+    if (!await context.Comments.AnyAsync(c => c.Id == comment2Id))
+    {
+        context.Comments.Add(new Comment
+        {
+            Id = comment2Id,
+            Content = "Please add a short decision summary at the end.",
+            TimestampSeconds = 0f,
+            AssetId = asset2Id,
+            UserId = seededUser.Id,
+            CreatedAt = seedCreatedAt
+        });
+    }
+    
+    await context.SaveChangesAsync();
 }
 
 // Configure the HTTP request pipeline.
