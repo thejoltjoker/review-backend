@@ -1,6 +1,93 @@
 @Review.Api_HostAddress = http://localhost:5186
+@Email = john.doe.http@example.com
+@Password = password
+@BearerToken = paste-bearer-token-here
+@ApiKeyToken = paste-api-key-token-here
+@ApiKeyId = paste-api-key-id-here
+@ProjectId = paste-project-id-here
 
-GET {{Review.Api_HostAddress}}/weatherforecast/
+### Register user
+POST {{Review.Api_HostAddress}}/register
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+
+### Login (copy accessToken from response into @BearerToken)
+POST {{Review.Api_HostAddress}}/login?useCookies=false
+Content-Type: application/json
+
+{
+  "email": "{{Email}}",
+  "password": "{{Password}}"
+}
+
+###
+
+### Create API key (requires bearer token)
+POST {{Review.Api_HostAddress}}/ApiKeys
+Authorization: Bearer {{BearerToken}}
+Content-Type: application/json
+
+{
+  "name": "My first API key"
+}
+
+###
+
+### List API keys (requires bearer token)
+GET {{Review.Api_HostAddress}}/ApiKeys
+Authorization: Bearer {{BearerToken}}
 Accept: application/json
 
 ###
+
+### Revoke API key (requires bearer token)
+DELETE {{Review.Api_HostAddress}}/ApiKeys/{{ApiKeyId}}
+Authorization: Bearer {{BearerToken}}
+
+###
+
+### Get all projects (auth with API key)
+GET {{Review.Api_HostAddress}}/Projects
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+###
+
+### Get project by id (auth with API key)
+GET {{Review.Api_HostAddress}}/Projects/{{ProjectId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+###
+
+### Create project (auth with API key)
+POST {{Review.Api_HostAddress}}/Projects
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "name": "New demo project"
+}
+
+###
+
+### Update project (auth with API key)
+PUT {{Review.Api_HostAddress}}/Projects/{{ProjectId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated demo project"
+}
+
+###
+
+### Delete project (auth with API key)
+DELETE {{Review.Api_HostAddress}}/Projects/{{ProjectId}}
+Authorization: ApiKey {{ApiKeyToken}}
