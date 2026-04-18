@@ -24,6 +24,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 - Improve API key implementation
   [#5](https://github.com/thejoltjoker/review-backend/pull/5)
+- Improve project service and controller
+  [#7](https://github.com/thejoltjoker/review-backend/pull/7)
 
 ### Deprecated
 
