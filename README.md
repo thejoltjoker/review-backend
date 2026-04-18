@@ -1,9 +1,51 @@
 # Review Backend
 
-## Setup
+ASP.NET Core Web API for an asset review system. The API uses Identity bearer auth and API key auth for protected endpoints.
 
-1. Clone the repository
-2. Run `dotnet run` to start the application
+## Prerequisites
+
+- .NET 10 SDK
+- A HTTP client for testing APIs (e.g. Postman, Insomnia, curl, etc.)
+
+## Run Locally
+
+1. Clone the repository:
+   - `git clone <repo-url>`
+   - `cd <repo-name>`
+2. Restore dependencies:
+   - `dotnet restore`
+3. Start the API:
+   - `dotnet run`
+4. Open Swagger UI:
+   - `https://localhost:7186`
+   - (HTTP alternative: `http://localhost:5186`)
+
+## Development Defaults
+
+- The app runs with `ASPNETCORE_ENVIRONMENT=Development` via `launchSettings.json`.
+- Database is currently in-memory, so data is reset when the app restarts.
+- A seeded user is available in development:
+  - Email: `john.doe@example.com`
+  - Password: `password`
+
+## Authentication Flow (Quick Start)
+
+1. Login (or register) using Identity endpoints:
+   - `POST /login`
+   - `POST /register`
+2. Create an API key with a bearer token:
+   - `POST /ApiKeys`
+   - `DELETE /ApiKeys/{keyId}`
+3. Access protected resources:
+   - `GET /Projects`
+   - `POST /Projects`
+   - `GET /Projects/{projectId}`
+   - `PUT /Projects/{projectId}`
+   - `DELETE /Projects/{projectId}`
+4. To use API key auth, send:
+   - `Authorization: ApiKey <api-key-token>`
+
+---
 
 ## Assignment
 
