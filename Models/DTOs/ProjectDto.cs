@@ -8,6 +8,13 @@ public class CreateProjectDto
     [StringLength(128, MinimumLength = 2)]
     public string Name { get; set; } = string.Empty;
 }
+public class UpdateProjectDto
+{
+    [Required]
+    [StringLength(128, MinimumLength = 2)]
+    [RegularExpression(@".*\S.*", ErrorMessage = "Name must contain non-whitespace characters.")]
+    public string Name { get; set; } = string.Empty;
+}
 
 public class ProjectDto
 {

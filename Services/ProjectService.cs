@@ -36,10 +36,10 @@ public class ProjectService : IProjectService
 
     public async Task<ProjectDto> CreateAsync(string userId, CreateProjectDto data)
     {
-        // TODO validate data
         var project = _mapper.Map<Project>(data);
         var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null) throw new Exception("User not found");
+        // TODO Use a custom exception that maps to 404
+        if (user == null) throw new KeyNotFoundException("User not found");
         if (project.Users.All(u => u.Id != user.Id))
         {
             project.Users.Add(user);
@@ -50,13 +50,11 @@ public class ProjectService : IProjectService
         return _mapper.Map<ProjectDto>(result);
     }
 
-    public async Task<bool> UpdateAsync(string userId, string projectId, Project project)
+    public async Task<bool> UpdateAsync(string userId, string projectId, UpdateProjectDto data)
     {
-        // TODO validate data
         var existing = await _projectRepository.GetByIdForUserAsync(userId, projectId);
         if (existing == null) return false;
-        existing.Name = project.Name;
-        existing.CreatedAt = project.CreatedAt;
+        existing.Name = data.Name;
         _projectRepository.Update(existing);
         await _projectRepository.SaveAsync();
         return true;
