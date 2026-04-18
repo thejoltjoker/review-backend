@@ -26,6 +26,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#5](https://github.com/thejoltjoker/review-backend/pull/5)
 - Improve project service and controller
   [#7](https://github.com/thejoltjoker/review-backend/pull/7)
+- Add better documentation to README and http file
+  [#8](https://github.com/thejoltjoker/review-backend/pull/8)
 
 ### Deprecated
 
