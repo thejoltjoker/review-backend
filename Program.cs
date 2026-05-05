@@ -7,8 +7,14 @@ using Review.Api.Models;
 using Review.Api.Repositories;
 using Review.Api.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+var allowLocalHost = "_AllowLocalHost";
 
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: allowLocalHost,
+        policy => { policy.WithOrigins("http://localhost:3000"); });
+});
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
 builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
@@ -115,8 +121,8 @@ using (var scope = app.Services.CreateScope())
 
         seededUser = user;
     }
-    
-    
+
+
     // Seed at runtime instead of HasData to be able to make relationship to user
     DateTime seedCreatedAt = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     const string asset1Id = "ASSET000-0000-0000-0000-000000000001";
@@ -125,7 +131,7 @@ using (var scope = app.Services.CreateScope())
     const string comment2Id = "COMMENT0-0000-0000-0000-000000000002";
     const string project1Id = "PROJECT0-0000-0000-0000-000000000001";
     const string project2Id = "PROJECT0-0000-0000-0000-000000000002";
-    
+
     if (!await context.Projects.AnyAsync(p => p.Id == project1Id))
     {
         context.Projects.Add(new Project("The Code Awakens")
@@ -134,6 +140,7 @@ using (var scope = app.Services.CreateScope())
             CreatedAt = seedCreatedAt
         });
     }
+
     if (!await context.Projects.AnyAsync(p => p.Id == project2Id))
     {
         context.Projects.Add(new Project("Ctrl+Alt+Delight")
@@ -150,12 +157,13 @@ using (var scope = app.Services.CreateScope())
     {
         project1.Users.Add(seededUser);
     }
+
     var project2 = await context.Projects.FirstAsync(p => p.Id == project2Id);
     if (project2.Users.All(u => u.Id != seededUser.Id))
     {
         project2.Users.Add(seededUser);
     }
-    
+
     if (!await context.Assets.AnyAsync(a => a.Id == asset1Id))
     {
         context.Assets.Add(new Asset
@@ -169,6 +177,7 @@ using (var scope = app.Services.CreateScope())
             CreatedAt = seedCreatedAt
         });
     }
+
     if (!await context.Assets.AnyAsync(a => a.Id == asset2Id))
     {
         context.Assets.Add(new Asset
@@ -182,33 +191,38 @@ using (var scope = app.Services.CreateScope())
             CreatedAt = seedCreatedAt
         });
     }
+
     if (!await context.Comments.AnyAsync(c => c.Id == comment1Id))
     {
-        context.Comments.Add(new Comment
+        context.Comments.Add(new Comment(
+            "Great onboarding section, very clear.",
+            18.5f,
+            asset1Id,
+            seededUser.Id)
         {
             Id = comment1Id,
-            Content = "Great onboarding section, very clear.",
-            TimestampSeconds = 18.5f,
-            AssetId = asset1Id,
-            UserId = seededUser.Id,
             CreatedAt = seedCreatedAt
         });
     }
+
     if (!await context.Comments.AnyAsync(c => c.Id == comment2Id))
     {
-        context.Comments.Add(new Comment
+        context.Comments.Add(new Comment(
+            "Please add a short decision summary at the end.",
+            0f,
+            asset2Id,
+            seededUser.Id)
         {
             Id = comment2Id,
-            Content = "Please add a short decision summary at the end.",
-            TimestampSeconds = 0f,
-            AssetId = asset2Id,
-            UserId = seededUser.Id,
             CreatedAt = seedCreatedAt
         });
     }
-    
+
     await context.SaveChangesAsync();
 }
+
+app.UseCors(allowLocalHost);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
