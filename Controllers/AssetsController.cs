@@ -67,9 +67,19 @@ public class AssetsController : ControllerBase
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        var result = await _service.UpdateAsync(userId, assetId, data);
-        if (!result) return NotFound();
-        return NoContent();
+        EntityStatus result = await _service.UpdateAsync(userId, assetId, data);
+        if (result == EntityStatus.Updated || result == EntityStatus.NoChanges) return NoContent();
+        if (result == EntityStatus.NotFound) return NotFound();
+        if (result == EntityStatus.Forbidden) return Forbid();
+        if (result == EntityStatus.InvalidReference)
+        {
+            return UnprocessableEntity(new
+            {
+                message = "Referenced entity does not exist or is inaccessible."
+            });
+        }
+
+        return Problem("Something went wrong");
     }
     
     

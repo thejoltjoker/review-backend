@@ -34,32 +34,33 @@ public class AssetService : IAssetService
     public async Task<AssetDto> CreateAsync(string userId, CreateAssetDto data)
     {
         Asset asset = _mapper.Map<Asset>(data);
+        // TODO check if user on project
         asset.UserId = userId;
         await _repository.AddAsync(asset);
         await _repository.SaveAsync();
         return _mapper.Map<AssetDto>(asset);
     }
 
-    public async Task<bool> UpdateAsync(string userId, string assetId, UpdateAssetDto data)
+    public async Task<EntityStatus> UpdateAsync(string userId, string assetId, UpdateAssetDto data)
     {
         Asset? asset = await _repository.GetByIdAsync(userId, assetId);
-        if (asset == null) return false;
+        if (asset == null) return EntityStatus.NotFound;
 
         bool hasChanges = false;
 
-        if (data.FileName != null && data.FileName != asset.FileName)
+        if (data.FileName != asset.FileName)
         {
             asset.FileName = data.FileName;
             hasChanges = true;
         }
 
-        if (data.FileUrl != null && data.FileUrl != asset.FileUrl)
+        if (data.FileUrl != asset.FileUrl)
         {
             asset.FileUrl = data.FileUrl;
             hasChanges = true;
         }
 
-        if (data.FileType != null && data.FileType != asset.FileType)
+        if (data.FileType != asset.FileType)
         {
             asset.FileType = data.FileType;
             hasChanges = true;
@@ -68,16 +69,16 @@ public class AssetService : IAssetService
         if (!string.IsNullOrWhiteSpace(data.ProjectId) && data.ProjectId != asset.ProjectId)
         {
             Project? project = await _projectRepository.GetByIdForUserAsync(userId, data.ProjectId);
-            if (project == null) return false;
+            if (project == null) return EntityStatus.InvalidReference;
             asset.ProjectId = data.ProjectId;
             hasChanges = true;
         }
 
-        if (!hasChanges) return true;
+        if (!hasChanges) return EntityStatus.NoChanges;
 
         _repository.Update(asset);
         await _repository.SaveAsync();
-        return true;
+        return EntityStatus.Updated;
     }
 
     public async Task<EntityStatus> DeleteAsync(string userId, string assetId)

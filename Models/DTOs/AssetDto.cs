@@ -34,14 +34,14 @@ public class UpdateAssetDto
 {
     [StringLength(255)]
     [RegularExpression(@"^[^\s]+$", ErrorMessage = "File name cannot contain spaces.")]
-    public string? FileName { get; set; } = null;
+    public string FileName { get; set; } = string.Empty;
 
-    [Url] public string? FileUrl { get; set; } = null;
+    [Url] public string FileUrl { get; set; } = string.Empty;
 
     [StringLength(255)]
     [RegularExpression(@"^[^\s]+$", ErrorMessage = "File type cannot contain spaces.")]
-    public string? FileType { get; set; } = null;
+    public string FileType { get; set; } = string.Empty;
     
     [StringLength(255)]
-    public string? ProjectId { get; set; } = null;
+    public string ProjectId { get; set; } = string.Empty;
 }
