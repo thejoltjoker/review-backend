@@ -80,12 +80,12 @@ public class AssetService : IAssetService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(string userId, string assetId)
+    public async Task<EntityStatus> DeleteAsync(string userId, string assetId)
     {
         var asset = await _repository.GetByIdAsync(userId, assetId);
-        if (asset == null) return false;
+        if (asset == null) return EntityStatus.NotFound;
         _repository.Delete(asset);
         await _repository.SaveAsync();
-        return true;
+        return EntityStatus.Deleted;
     }
 }

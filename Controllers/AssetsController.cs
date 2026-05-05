@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Review.Api.Models;
 using Review.Api.Models.DTOs;
 using Review.Api.Services;
 
@@ -81,7 +82,8 @@ public class AssetsController : ControllerBase
 
         var result = await _service.DeleteAsync(userId, assetId);
         // TODO Add more variation to error handling, i.e. unauthorized (because not project owner)
-        if (!result) return NotFound();
+        if (result == EntityStatus.NotFound) return NotFound();
+        if (result == EntityStatus.Deleted) return NoContent();
         return NoContent();
     }
 }
