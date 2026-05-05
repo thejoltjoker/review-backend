@@ -19,6 +19,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#4](https://github.com/thejoltjoker/review-backend/pull/4)
 - Add simple global exception handler middleware
   [#6](https://github.com/thejoltjoker/review-backend/pull/6)
+- Implement CRUD functionality for `Asset` entity
+  [#9](https://github.com/thejoltjoker/review-backend/pull/9)
 
 ### Changed
 
