@@ -5,6 +5,7 @@ namespace Review.Api.Models.DTOs;
 
 public class CommentDto
 {
+    public string Id { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
     public float TimestampSeconds { get; set; } = 0;
 
