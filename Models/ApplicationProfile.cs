@@ -11,7 +11,10 @@ public class ApplicationProfile : Profile
         CreateMap<Project, ProjectWithAssetsDto>();
         CreateMap<CreateProjectDto, Project>();
         CreateMap<UpdateProjectDto, Project>();
+        CreateMap<Comment, CommentDto>();
+        CreateMap<CreateCommentDto, Comment>();
         CreateMap<Asset, AssetDto>();
+        CreateMap<CreateAssetDto, Asset>();
         CreateMap<User, UserDto>();
         CreateMap<ApiKey, ApiKeyDto>();
     }
