@@ -27,10 +27,10 @@ public class AssetService : IAssetService
         return _mapper.Map<IEnumerable<AssetDto>>(result);
     }
 
-    public async Task<AssetDto?> GetByIdAsync(string userId, string assetId)
+    public async Task<AssetWithCommentsDto?> GetByIdAsync(string userId, string assetId)
     {
         Asset? result = await _repository.GetByIdAsync(userId, assetId);
-        return _mapper.Map<AssetDto>(result);
+        return _mapper.Map<AssetWithCommentsDto>(result);
     }
 
     public async Task<AssetDto> CreateAsync(string userId, CreateAssetDto data)

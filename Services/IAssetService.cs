@@ -8,7 +8,7 @@ namespace Review.Api.Services;
 public interface IAssetService
 {
     Task<IEnumerable<AssetDto>> GetAllAsync(string userId);
-    Task<AssetDto?> GetByIdAsync(string userId, string assetId);
+    Task<AssetWithCommentsDto?> GetByIdAsync(string userId, string assetId);
     Task<AssetDto> CreateAsync(string userId, CreateAssetDto data);
     Task<EntityStatus> UpdateAsync(string userId, string assetId, UpdateAssetDto data);
     Task<EntityStatus> DeleteAsync(string userId, string assetId);

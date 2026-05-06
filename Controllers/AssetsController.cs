@@ -34,15 +34,16 @@ public class AssetsController : ControllerBase
 
     [HttpGet]
     [Route("{assetId}")]
-    public async Task<ActionResult<AssetDto>> GetById(string assetId)
+    public async Task<ActionResult<AssetWithCommentsDto>> GetById(string assetId)
     {
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        AssetDto? result = await _service.GetByIdAsync(userId, assetId);
+        AssetWithCommentsDto? result = await _service.GetByIdAsync(userId, assetId);
         if (result == null) return NotFound();
         return Ok(result);
     }
+
 
     [HttpPost]
     public async Task<ActionResult<AssetDto>> Create([FromBody] CreateAssetDto data)
@@ -83,8 +84,8 @@ public class AssetsController : ControllerBase
 
         return Problem("Something went wrong");
     }
-    
-    
+
+
     [HttpDelete]
     [Route("{assetId}")]
     public async Task<ActionResult> Delete(string assetId)
