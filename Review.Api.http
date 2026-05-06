@@ -1,15 +1,6 @@
-@Review.Api_HostAddress = http://localhost:5186
-@Email = john.doe.http@example.com
-@Password = password
-@BearerToken = paste-bearer-token-here
-@ApiKeyToken = paste-api-key-token-here
-@ApiKeyId = paste-api-key-id-here
-@ProjectId = paste-project-id-here
-@AssetId = paste-asset-id-here
-@CommentId = paste-comment-id-here
-
 ### Register user
-POST {{Review.Api_HostAddress}}/register
+# @name registerUser
+POST {{Review_Api_HostAddress}}/register
 Content-Type: application/json
 
 {
@@ -19,19 +10,25 @@ Content-Type: application/json
 
 ###
 
-### Login (copy accessToken from response into @BearerToken)
-POST {{Review.Api_HostAddress}}/login?useCookies=false
+### Login (stores accessToken into global BearerToken for next requests)
+# @name loginUser
+POST {{Review_Api_HostAddress}}/login?useCookies=false
 Content-Type: application/json
 
 {
   "email": "{{Email}}",
   "password": "{{Password}}"
 }
+
+> {%
+  client.global.set("BearerToken", response.body.accessToken);
+%}
 
 ###
 
 ### Create API key (requires bearer token)
-POST {{Review.Api_HostAddress}}/ApiKeys
+# @name createApiKey
+POST {{Review_Api_HostAddress}}/ApiKeys
 Authorization: Bearer {{BearerToken}}
 Content-Type: application/json
 
@@ -39,37 +36,24 @@ Content-Type: application/json
   "name": "My first API key"
 }
 
+> {%
+  client.global.set("ApiKeyToken", response.body.token);
+  client.global.set("ApiKeyId", response.body.token.split(".")[0]);
+%}
+
 ###
 
 ### List API keys (requires bearer token)
-GET {{Review.Api_HostAddress}}/ApiKeys
+# @name listApiKeys
+GET {{Review_Api_HostAddress}}/ApiKeys
 Authorization: Bearer {{BearerToken}}
-Accept: application/json
-
-###
-
-### Revoke API key (requires bearer token)
-DELETE {{Review.Api_HostAddress}}/ApiKeys/{{ApiKeyId}}
-Authorization: Bearer {{BearerToken}}
-
-###
-
-### Get all projects (auth with API key)
-GET {{Review.Api_HostAddress}}/Projects
-Authorization: ApiKey {{ApiKeyToken}}
-Accept: application/json
-
-###
-
-### Get project by id (auth with API key)
-GET {{Review.Api_HostAddress}}/Projects/{{ProjectId}}
-Authorization: ApiKey {{ApiKeyToken}}
 Accept: application/json
 
 ###
 
 ### Create project (auth with API key)
-POST {{Review.Api_HostAddress}}/Projects
+# @name createProject
+POST {{Review_Api_HostAddress}}/Projects
 Authorization: ApiKey {{ApiKeyToken}}
 Content-Type: application/json
 
@@ -77,10 +61,31 @@ Content-Type: application/json
   "name": "New demo project"
 }
 
+> {%
+  client.global.set("ProjectId", response.body.id);
+%}
+
+###
+
+### Get all projects (auth with API key)
+# @name listProjects
+GET {{Review_Api_HostAddress}}/Projects
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+###
+
+### Get project by id (auth with API key)
+# @name getProjectById
+GET {{Review_Api_HostAddress}}/Projects/{{ProjectId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
 ###
 
 ### Update project (auth with API key)
-PUT {{Review.Api_HostAddress}}/Projects/{{ProjectId}}
+# @name updateProject
+PUT {{Review_Api_HostAddress}}/Projects/{{ProjectId}}
 Authorization: ApiKey {{ApiKeyToken}}
 Content-Type: application/json
 
@@ -90,28 +95,9 @@ Content-Type: application/json
 
 ###
 
-### Delete project (auth with API key)
-DELETE {{Review.Api_HostAddress}}/Projects/{{ProjectId}}
-Authorization: ApiKey {{ApiKeyToken}}
-
-###
-
-### Get all assets (auth with API key)
-GET {{Review.Api_HostAddress}}/Assets
-Authorization: ApiKey {{ApiKeyToken}}
-Accept: application/json
-
-###
-
-### Get asset by id (includes comments, auth with API key)
-GET {{Review.Api_HostAddress}}/Assets/{{AssetId}}
-Authorization: ApiKey {{ApiKeyToken}}
-Accept: application/json
-
-###
-
 ### Create asset (auth with API key)
-POST {{Review.Api_HostAddress}}/Assets
+# @name createAsset
+POST {{Review_Api_HostAddress}}/Assets
 Authorization: ApiKey {{ApiKeyToken}}
 Content-Type: application/json
 
@@ -122,10 +108,31 @@ Content-Type: application/json
   "projectId": "{{ProjectId}}"
 }
 
+> {%
+  client.global.set("AssetId", response.body.id);
+%}
+
+###
+
+### Get all assets (auth with API key)
+# @name listAssets
+GET {{Review_Api_HostAddress}}/Assets
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+###
+
+### Get asset by id (includes comments, auth with API key)
+# @name getAssetById
+GET {{Review_Api_HostAddress}}/Assets/{{AssetId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
 ###
 
 ### Update asset (auth with API key)
-PUT {{Review.Api_HostAddress}}/Assets/{{AssetId}}
+# @name updateAsset
+PUT {{Review_Api_HostAddress}}/Assets/{{AssetId}}
 Authorization: ApiKey {{ApiKeyToken}}
 Content-Type: application/json
 
@@ -138,21 +145,9 @@ Content-Type: application/json
 
 ###
 
-### Delete asset (auth with API key)
-DELETE {{Review.Api_HostAddress}}/Assets/{{AssetId}}
-Authorization: ApiKey {{ApiKeyToken}}
-
-###
-
-### Get comment by id (auth with API key)
-GET {{Review.Api_HostAddress}}/Comments/{{CommentId}}
-Authorization: ApiKey {{ApiKeyToken}}
-Accept: application/json
-
-###
-
 ### Create comment (auth with API key)
-POST {{Review.Api_HostAddress}}/Comments
+# @name createComment
+POST {{Review_Api_HostAddress}}/Comments
 Authorization: ApiKey {{ApiKeyToken}}
 Content-Type: application/json
 
@@ -163,10 +158,23 @@ Content-Type: application/json
   "userId": "ignored-by-server"
 }
 
+> {%
+  client.global.set("CommentId", response.body.id);
+%}
+
+###
+
+### Get comment by id (auth with API key)
+# @name getCommentById
+GET {{Review_Api_HostAddress}}/Comments/{{CommentId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
 ###
 
 ### Update comment (auth with API key)
-PUT {{Review.Api_HostAddress}}/Comments/{{CommentId}}
+# @name updateComment
+PUT {{Review_Api_HostAddress}}/Comments/{{CommentId}}
 Authorization: ApiKey {{ApiKeyToken}}
 Content-Type: application/json
 
@@ -178,5 +186,28 @@ Content-Type: application/json
 ###
 
 ### Delete comment (auth with API key)
-DELETE {{Review.Api_HostAddress}}/Comments/{{CommentId}}
+# @name deleteComment
+DELETE {{Review_Api_HostAddress}}/Comments/{{CommentId}}
 Authorization: ApiKey {{ApiKeyToken}}
+
+###
+
+### Delete asset (auth with API key)
+# @name deleteAsset
+DELETE {{Review_Api_HostAddress}}/Assets/{{AssetId}}
+Authorization: ApiKey {{ApiKeyToken}}
+
+###
+
+### Delete project (auth with API key)
+# @name deleteProject
+DELETE {{Review_Api_HostAddress}}/Projects/{{ProjectId}}
+Authorization: ApiKey {{ApiKeyToken}}
+
+###
+
+### Revoke API key (requires bearer token)
+# @name revokeApiKey
+DELETE {{Review_Api_HostAddress}}/ApiKeys/{{ApiKeyId}}
+Authorization: Bearer {{BearerToken}}
+
