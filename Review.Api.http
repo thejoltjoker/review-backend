@@ -8,6 +8,12 @@ Content-Type: application/json
   "password": "{{Password}}"
 }
 
+> {%
+  client.test("registerUser status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
+
 ###
 
 ### Login (stores accessToken into global BearerToken for next requests)
@@ -21,6 +27,9 @@ Content-Type: application/json
 }
 
 > {%
+  client.test("loginUser status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
   client.global.set("BearerToken", response.body.accessToken);
 %}
 
@@ -37,6 +46,9 @@ Content-Type: application/json
 }
 
 > {%
+  client.test("createApiKey status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
   client.global.set("ApiKeyToken", response.body.token);
   client.global.set("ApiKeyId", response.body.token.split(".")[0]);
 %}
@@ -48,6 +60,12 @@ Content-Type: application/json
 GET {{Review_Api_HostAddress}}/ApiKeys
 Authorization: Bearer {{BearerToken}}
 Accept: application/json
+
+> {%
+  client.test("listApiKeys status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
 
 ###
 
@@ -62,6 +80,9 @@ Content-Type: application/json
 }
 
 > {%
+  client.test("createProject status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
   client.global.set("ProjectId", response.body.id);
 %}
 
@@ -73,6 +94,12 @@ GET {{Review_Api_HostAddress}}/Projects
 Authorization: ApiKey {{ApiKeyToken}}
 Accept: application/json
 
+> {%
+  client.test("listProjects status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
+
 ###
 
 ### Get project by id (auth with API key)
@@ -80,6 +107,12 @@ Accept: application/json
 GET {{Review_Api_HostAddress}}/Projects/{{ProjectId}}
 Authorization: ApiKey {{ApiKeyToken}}
 Accept: application/json
+
+> {%
+  client.test("getProjectById status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
 
 ###
 
@@ -92,6 +125,12 @@ Content-Type: application/json
 {
   "name": "Updated demo project"
 }
+
+> {%
+  client.test("updateProject status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
 
 ###
 
@@ -109,6 +148,9 @@ Content-Type: application/json
 }
 
 > {%
+  client.test("createAsset status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
   client.global.set("AssetId", response.body.id);
 %}
 
@@ -120,6 +162,12 @@ GET {{Review_Api_HostAddress}}/Assets
 Authorization: ApiKey {{ApiKeyToken}}
 Accept: application/json
 
+> {%
+  client.test("listAssets status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
+
 ###
 
 ### Get asset by id (includes comments, auth with API key)
@@ -127,6 +175,12 @@ Accept: application/json
 GET {{Review_Api_HostAddress}}/Assets/{{AssetId}}
 Authorization: ApiKey {{ApiKeyToken}}
 Accept: application/json
+
+> {%
+  client.test("getAssetById status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
 
 ###
 
@@ -142,6 +196,12 @@ Content-Type: application/json
   "fileType": "video/mp4",
   "projectId": "{{ProjectId}}"
 }
+
+> {%
+  client.test("updateAsset status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
 
 ###
 
@@ -159,6 +219,9 @@ Content-Type: application/json
 }
 
 > {%
+  client.test("createComment status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
   client.global.set("CommentId", response.body.id);
 %}
 
@@ -169,6 +232,12 @@ Content-Type: application/json
 GET {{Review_Api_HostAddress}}/Comments/{{CommentId}}
 Authorization: ApiKey {{ApiKeyToken}}
 Accept: application/json
+
+> {%
+  client.test("getCommentById status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
 
 ###
 
@@ -183,12 +252,24 @@ Content-Type: application/json
   "timestampSeconds": 13.2
 }
 
+> {%
+  client.test("updateComment status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
 ###
 
 ### Delete comment (auth with API key)
 # @name deleteComment
 DELETE {{Review_Api_HostAddress}}/Comments/{{CommentId}}
 Authorization: ApiKey {{ApiKeyToken}}
+
+> {%
+  client.test("deleteComment status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
 
 ###
 
@@ -197,6 +278,12 @@ Authorization: ApiKey {{ApiKeyToken}}
 DELETE {{Review_Api_HostAddress}}/Assets/{{AssetId}}
 Authorization: ApiKey {{ApiKeyToken}}
 
+> {%
+  client.test("deleteAsset status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
 ###
 
 ### Delete project (auth with API key)
@@ -204,10 +291,22 @@ Authorization: ApiKey {{ApiKeyToken}}
 DELETE {{Review_Api_HostAddress}}/Projects/{{ProjectId}}
 Authorization: ApiKey {{ApiKeyToken}}
 
+> {%
+  client.test("deleteProject status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
 ###
 
 ### Revoke API key (requires bearer token)
 # @name revokeApiKey
 DELETE {{Review_Api_HostAddress}}/ApiKeys/{{ApiKeyId}}
 Authorization: Bearer {{BearerToken}}
+
+> {%
+  client.test("revokeApiKey status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
 
