@@ -15,6 +15,22 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Project> Projects { get; set; }
     public DbSet<User> Users { get; set; }
 
+    // TODO Remove this if not needed
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<ProjectUser>(entity =>
+        {
+            entity.HasKey(projectUser => new { projectUser.ProjectId, projectUser.UserId });
+            entity.HasOne(projectUser => projectUser.Project)
+                .WithMany(project => project.ProjectUsers)
+                .HasForeignKey(projectUser => projectUser.ProjectId);
+            entity.HasOne(projectUser => projectUser.User)
+                .WithMany(user => user.ProjectUsers)
+                .HasForeignKey(projectUser => projectUser.UserId);
+        });
+
+    }
 
     private void SetTimestamps()
     {
@@ -28,6 +44,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 {
                     entry.Entity.CreatedAt = now;
                 }
+
                 entry.Entity.UpdatedAt = now;
             }
             else if (entry.State == EntityState.Modified)

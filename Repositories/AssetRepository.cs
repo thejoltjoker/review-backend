@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Review.Api.Contexts;
 using Review.Api.Models;
@@ -20,8 +17,7 @@ public class AssetRepository(ApplicationDbContext context) : IAssetRepository
     public async Task<List<Asset>> GetAllByProjectIdAsync(string userId, string projectId) =>
         await _context.Assets.AsNoTracking()
             .Where(asset => asset.ProjectId == projectId &&
-                            asset.Project != null &&
-                            asset.Project.Users.Any(p => p.Id == userId))
+                            asset.Project.ProjectUsers.Any(p => p.UserId == userId))
             .ToListAsync();
 
 

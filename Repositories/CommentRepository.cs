@@ -16,7 +16,7 @@ public class CommentRepository(ApplicationDbContext context) : ICommentRepositor
         // TODO Check if user has access to project
         return await _context.Comments.AsNoTracking()
             .Where(comment => comment.Asset != null &&
-                              comment.Asset.Project.Users.Any(u => u.Id == userId))
+                              comment.Asset.Project.ProjectUsers.Any(u => u.UserId == userId))
             .Where(comment => comment.AssetId == assetId)
             .ToListAsync();
     }
@@ -25,7 +25,7 @@ public class CommentRepository(ApplicationDbContext context) : ICommentRepositor
     {
         return await _context.Comments.AsNoTracking()
             .Where(comment => comment.Asset != null &&
-                        comment.Asset.Project.Users.Any(u => u.Id == userId))
+                        comment.Asset.Project.ProjectUsers.Any(u => u.UserId == userId))
             .FirstOrDefaultAsync(comment => comment.Id == commentId);
     }
 

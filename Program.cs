@@ -141,7 +141,8 @@ using (var scope = app.Services.CreateScope())
         context.Projects.Add(new Project("The Code Awakens", userId)
         {
             Id = project1Id,
-            CreatedAt = seedCreatedAt
+            CreatedAt = seedCreatedAt,
+            CreatedByUserId = userId
         });
     }
 
@@ -150,22 +151,31 @@ using (var scope = app.Services.CreateScope())
         context.Projects.Add(new Project("Ctrl+Alt+Delight", userId)
         {
             Id = project2Id,
-            CreatedAt = seedCreatedAt
+            CreatedAt = seedCreatedAt,
+            CreatedByUserId = userId
         });
     }
 
     await context.SaveChangesAsync();
 
-    var project1 = await context.Projects.FirstAsync(p => p.Id == project1Id);
-    if (project1.Users.All(u => u.Id != seededUser.Id))
+    if (!await context.Set<ProjectUser>().AnyAsync(pu => pu.ProjectId == project1Id && pu.UserId == seededUser.Id))
     {
-        project1.Users.Add(seededUser);
+        context.Set<ProjectUser>().Add(new ProjectUser
+        {
+            ProjectId = project1Id,
+            UserId = seededUser.Id,
+            Role = ProjectUserRole.Owner
+        });
     }
 
-    var project2 = await context.Projects.FirstAsync(p => p.Id == project2Id);
-    if (project2.Users.All(u => u.Id != seededUser.Id))
+    if (!await context.Set<ProjectUser>().AnyAsync(pu => pu.ProjectId == project2Id && pu.UserId == seededUser.Id))
     {
-        project2.Users.Add(seededUser);
+        context.Set<ProjectUser>().Add(new ProjectUser
+        {
+            ProjectId = project2Id,
+            UserId = seededUser.Id,
+            Role = ProjectUserRole.Owner
+        });
     }
 
     if (!await context.Assets.AnyAsync(a => a.Id == asset1Id))

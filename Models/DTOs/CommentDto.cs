@@ -23,6 +23,6 @@ public class CreateCommentDto
 
 public class UpdateCommentDto
 {
-    [Required] [StringLength(512)] public string Content { get; set; }
+    [Required] [StringLength(512)] public string Content { get; set; } = string.Empty;
     [Required] [Range(0, float.MaxValue)] public float TimestampSeconds { get; set; }
 }

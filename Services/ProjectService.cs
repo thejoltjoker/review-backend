@@ -40,8 +40,17 @@ public class ProjectService : IProjectService
         // TODO Return EntityStatus instead of throwing
         if (user == null) throw new KeyNotFoundException("User not found");
 
+
         Project project = new(data.Name, userId);
-        project.Users.Add(user);
+
+        project.ProjectUsers.Add(new ProjectUser
+        {
+            ProjectId = project.Id,
+            UserId = user.Id,
+            Project = project,
+            User = user,
+            Role = ProjectUserRole.Owner
+        });
 
         Project result = await _projectRepository.AddAsync(project);
         await _projectRepository.SaveAsync();
