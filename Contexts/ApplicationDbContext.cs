@@ -24,14 +24,19 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(projectUser => projectUser.UserId).IsRequired().HasMaxLength(255);
             entity.Property(projectUser => projectUser.Role)
                 .IsRequired()
-                .HasConversion<int>();
+                .HasConversion<string>();
+
+            entity.HasIndex(projectUser => projectUser.UserId);
 
             entity.HasOne(projectUser => projectUser.Project)
                 .WithMany(project => project.ProjectUsers)
-                .HasForeignKey(projectUser => projectUser.ProjectId);
+                .HasForeignKey(projectUser => projectUser.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             entity.HasOne(projectUser => projectUser.User)
                 .WithMany(user => user.ProjectUsers)
-                .HasForeignKey(projectUser => projectUser.UserId);
+                .HasForeignKey(projectUser => projectUser.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 
@@ -39,7 +44,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         DateTime now = DateTime.UtcNow;
 
-        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        foreach (var entry in ChangeTracker.Entries<IHasTimestamps>())
         {
             if (entry.State == EntityState.Added)
             {

@@ -1,6 +1,6 @@
 namespace Review.Api.Models;
 
-public class BaseEntity
+public class BaseEntity : IHasTimestamps
 {
     // TODO Look into using Guid type or generic
     public string Id { get; set; } = Guid.NewGuid().ToString();
