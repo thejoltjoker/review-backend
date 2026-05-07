@@ -14,7 +14,7 @@ public class ProjectService : IProjectService
 
 
     public ProjectService(IProjectRepository projectRepository, IUserRepository userRepository, IMapper mapper)
-    // TODO Improve error handling
+        // TODO Improve error handling
     {
         _projectRepository = projectRepository;
         _userRepository = userRepository;
@@ -36,16 +36,14 @@ public class ProjectService : IProjectService
 
     public async Task<ProjectDto> CreateAsync(string userId, CreateProjectDto data)
     {
-        var project = _mapper.Map<Project>(data);
-        var user = await _userRepository.GetByIdAsync(userId);
-        // TODO Use a custom exception that maps to 404
+        User? user = await _userRepository.GetByIdAsync(userId);
+        // TODO Return EntityStatus instead of throwing
         if (user == null) throw new KeyNotFoundException("User not found");
-        if (project.Users.All(u => u.Id != user.Id))
-        {
-            project.Users.Add(user);
-        }
 
-        var result = await _projectRepository.AddAsync(project);
+        Project project = new(data.Name, userId);
+        project.Users.Add(user);
+
+        Project result = await _projectRepository.AddAsync(project);
         await _projectRepository.SaveAsync();
         return _mapper.Map<ProjectDto>(result);
     }

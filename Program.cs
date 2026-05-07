@@ -1,19 +1,13 @@
-using System;
-using System.Linq;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Review.Api.Contexts;
 using Review.Api.Handlers;
 using Review.Api.Models;
 using Review.Api.Repositories;
 using Review.Api.Services;
 
-var allowLocalHost = "_AllowLocalHost";
+string allowLocalHost = "_AllowLocalHost";
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
@@ -144,7 +138,7 @@ using (var scope = app.Services.CreateScope())
 
     if (!await context.Projects.AnyAsync(p => p.Id == project1Id))
     {
-        context.Projects.Add(new Project("The Code Awakens")
+        context.Projects.Add(new Project("The Code Awakens", userId)
         {
             Id = project1Id,
             CreatedAt = seedCreatedAt
@@ -153,7 +147,7 @@ using (var scope = app.Services.CreateScope())
 
     if (!await context.Projects.AnyAsync(p => p.Id == project2Id))
     {
-        context.Projects.Add(new Project("Ctrl+Alt+Delight")
+        context.Projects.Add(new Project("Ctrl+Alt+Delight", userId)
         {
             Id = project2Id,
             CreatedAt = seedCreatedAt

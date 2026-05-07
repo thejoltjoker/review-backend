@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Review.Api.Models;
 using Review.Api.Models.DTOs;
@@ -51,7 +50,7 @@ public class ProjectsController : ControllerBase
 
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
-
+        
         var result = await _service.CreateAsync(userId, data);
 
         return CreatedAtAction(nameof(GetById), new { projectId = result.Id }, result);
