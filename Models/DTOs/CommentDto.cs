@@ -7,14 +7,9 @@ public class CommentDto
 {
     public string Id { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
-    public float TimestampSeconds { get; set; } = 0;
-
+    public float TimestampSeconds { get; set; }
     public string AssetId { get; set; } = string.Empty;
-    public Asset? Asset { get; set; }
-
     public string UserId { get; set; } = string.Empty;
-    public User? User { get; set; }
-
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
 

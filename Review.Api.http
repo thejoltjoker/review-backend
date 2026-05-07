@@ -9,8 +9,8 @@ Content-Type: application/json
 }
 
 > {%
-  client.test("registerUser status is 200", function () {
-    client.assert(response.status === 200, "Expected 200 OK");
+  client.test("registerUser status is 200 or 400", function () {
+    client.assert(response.status === 200 || response.status === 400, "Expected 200 OK (new user) or 400 Bad Request (already exists)");
   });
 %}
 
@@ -268,6 +268,283 @@ Authorization: ApiKey {{ApiKeyToken}}
 > {%
   client.test("deleteComment status is 204", function () {
     client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
+###
+
+### Status coverage: 400 (validation) - create project with invalid payload
+# @name createProjectValidation400
+POST {{Review_Api_HostAddress}}/Projects
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "name": "a"
+}
+
+> {%
+  client.test("createProjectValidation400 status is 400", function () {
+    client.assert(response.status === 400, "Expected 400 Bad Request");
+  });
+%}
+
+###
+
+### Status coverage: 400 (validation) - create asset with invalid payload
+# @name createAssetValidation400
+POST {{Review_Api_HostAddress}}/Assets
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "fileName": "clip.mp4",
+  "fileUrl": "not-a-url",
+  "fileType": "video/mp4",
+  "projectId": "{{ProjectId}}"
+}
+
+> {%
+  client.test("createAssetValidation400 status is 400", function () {
+    client.assert(response.status === 400, "Expected 400 Bad Request");
+  });
+%}
+
+###
+
+### Status coverage: 401 (missing auth) - list projects without token
+# @name listProjectsUnauthorized401
+GET {{Review_Api_HostAddress}}/Projects
+Accept: application/json
+
+> {%
+  client.test("listProjectsUnauthorized401 status is 401", function () {
+    client.assert(response.status === 401, "Expected 401 Unauthorized");
+  });
+%}
+
+###
+
+### Status coverage: 404 (not found) - get missing project
+# @name getMissingProject404
+GET {{Review_Api_HostAddress}}/Projects/00000000-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("getMissingProject404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Status coverage: 404 (not found) - get missing asset
+# @name getMissingAsset404
+GET {{Review_Api_HostAddress}}/Assets/00000000-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("getMissingAsset404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Status coverage: 404 (not found) - get missing comment
+# @name getMissingComment404
+GET {{Review_Api_HostAddress}}/Comments/COMMENT0-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("getMissingComment404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Comment status coverage: 400 (validation) - create comment invalid payload
+# @name createCommentValidation400
+POST {{Review_Api_HostAddress}}/Comments
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "content": "",
+  "timestampSeconds": -1,
+  "assetId": "{{AssetId}}",
+  "userId": "ignored-by-server"
+}
+
+> {%
+  client.test("createCommentValidation400 status is 400", function () {
+    client.assert(response.status === 400, "Expected 400 Bad Request");
+  });
+%}
+
+###
+
+### Comment status coverage: 400 (validation) - update comment invalid payload
+# @name updateCommentValidation400
+PUT {{Review_Api_HostAddress}}/Comments/{{CommentId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "content": "",
+  "timestampSeconds": -1
+}
+
+> {%
+  client.test("updateCommentValidation400 status is 400", function () {
+    client.assert(response.status === 400, "Expected 400 Bad Request");
+  });
+%}
+
+###
+
+### Comment status coverage: 401 (missing auth) - get comment without token
+# @name getCommentUnauthorized401
+GET {{Review_Api_HostAddress}}/Comments/{{CommentId}}
+Accept: application/json
+
+> {%
+  client.test("getCommentUnauthorized401 status is 401", function () {
+    client.assert(response.status === 401, "Expected 401 Unauthorized");
+  });
+%}
+
+###
+
+### Comment status coverage: 404 (not found) - update missing comment
+# @name updateMissingComment404
+PUT {{Review_Api_HostAddress}}/Comments/COMMENT0-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "content": "will not update",
+  "timestampSeconds": 1
+}
+
+> {%
+  client.test("updateMissingComment404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Comment status coverage: 404 (not found) - delete missing comment
+# @name deleteMissingComment404
+DELETE {{Review_Api_HostAddress}}/Comments/COMMENT0-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+
+> {%
+  client.test("deleteMissingComment404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Status coverage: 422 (invalid reference) - move asset to missing project
+# @name updateAssetInvalidReference422
+PUT {{Review_Api_HostAddress}}/Assets/{{AssetId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "fileName": "clip-v3.mp4",
+  "fileUrl": "https://example.com/files/clip-v3.mp4",
+  "fileType": "video/mp4",
+  "projectId": "00000000-0000-0000-0000-000000000000"
+}
+
+> {%
+  client.test("updateAssetInvalidReference422 status is 422", function () {
+    client.assert(response.status === 422, "Expected 422 Unprocessable Entity");
+  });
+%}
+
+###
+
+### Secondary user for 403 coverage: register (allow reruns)
+# @name registerOtherUser
+POST {{Review_Api_HostAddress}}/register
+Content-Type: application/json
+
+{
+  "email": "{{OtherEmail}}",
+  "password": "{{OtherPassword}}"
+}
+
+> {%
+  client.test("registerOtherUser status is 200 or 400", function () {
+    client.assert(response.status === 200 || response.status === 400, "Expected 200 OK (new user) or 400 Bad Request (already exists)");
+  });
+%}
+
+###
+
+### Secondary user for 403 coverage: login
+# @name loginOtherUser
+POST {{Review_Api_HostAddress}}/login?useCookies=false
+Content-Type: application/json
+
+{
+  "email": "{{OtherEmail}}",
+  "password": "{{OtherPassword}}"
+}
+
+> {%
+  client.test("loginOtherUser status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+  client.global.set("OtherBearerToken", response.body.accessToken);
+%}
+
+###
+
+### Secondary user for 403 coverage: create API key
+# @name createOtherApiKey
+POST {{Review_Api_HostAddress}}/ApiKeys
+Authorization: Bearer {{OtherBearerToken}}
+Content-Type: application/json
+
+{
+  "name": "Other user key"
+}
+
+> {%
+  client.test("createOtherApiKey status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
+  client.global.set("OtherApiKeyToken", response.body.token);
+%}
+
+###
+
+### Status coverage: 403 (forbidden) - other user updates your asset
+# @name updateAssetForbidden403
+PUT {{Review_Api_HostAddress}}/Assets/{{AssetId}}
+Authorization: ApiKey {{OtherApiKeyToken}}
+Content-Type: application/json
+
+{
+  "fileName": "clip-should-fail.mp4",
+  "fileUrl": "https://example.com/files/clip-should-fail.mp4",
+  "fileType": "video/mp4",
+  "projectId": "{{ProjectId}}"
+}
+
+> {%
+  client.test("updateAssetForbidden403 status is 403", function () {
+    client.assert(response.status === 403, "Expected 403 Forbidden");
   });
 %}
 
