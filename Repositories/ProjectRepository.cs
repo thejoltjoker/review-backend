@@ -41,6 +41,15 @@ public class ProjectRepository(ApplicationDbContext context) : IProjectRepositor
             .FirstOrDefaultAsync(p => p.Id == projectId);
     }
 
+    public async Task<bool> ExistsForUserAsync(string userId, string projectId)
+    {
+        Project? result = await _context.Projects
+            .AsNoTracking()
+            .Where(project => project.Users.Any(user => user.Id == userId))
+            .FirstOrDefaultAsync(project => project.Id == projectId);
+        return result != null;
+    }
+
     public async Task<Project> AddAsync(Project project)
     {
         await _context.Projects.AddAsync(project);

@@ -53,12 +53,15 @@ public class AssetsController : ControllerBase
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        AssetDto result = await _service.CreateAsync(userId, data);
-        return CreatedAtAction(
-            nameof(GetById),
-            new { assetId = result.Id },
-            result
-        );
+        var result = await _service.CreateAsync(userId, data);
+        if (result.Status == EntityStatus.InvalidReference) return NotFound();
+        if (result.Status == EntityStatus.Created)
+            return CreatedAtAction(
+                nameof(GetById),
+                new { assetId = result.Asset?.Id },
+                result.Asset
+            );
+        return Problem("Something went wrong");
     }
 
     [HttpPut]

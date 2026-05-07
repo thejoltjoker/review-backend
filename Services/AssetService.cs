@@ -33,14 +33,16 @@ public class AssetService : IAssetService
         return _mapper.Map<AssetWithCommentsDto>(result);
     }
 
-    public async Task<AssetDto> CreateAsync(string userId, CreateAssetDto data)
+    public async Task<(EntityStatus Status, AssetDto? Asset)> CreateAsync(string userId, CreateAssetDto data)
     {
-        Asset asset = _mapper.Map<Asset>(data);
-        // TODO check if user on project
+        bool hasAccess = await _projectRepository.ExistsForUserAsync(userId, data.ProjectId);
+        if (!hasAccess) return (EntityStatus.InvalidReference, null);
+        
+        var asset = _mapper.Map<Asset>(data);
         asset.UserId = userId;
         await _repository.AddAsync(asset);
         await _repository.SaveAsync();
-        return _mapper.Map<AssetDto>(asset);
+        return (EntityStatus.Created, _mapper.Map<AssetDto>(asset));
     }
 
     public async Task<EntityStatus> UpdateAsync(string userId, string assetId, UpdateAssetDto data)

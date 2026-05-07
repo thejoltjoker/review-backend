@@ -14,12 +14,19 @@ public class CommentRepository(ApplicationDbContext context) : ICommentRepositor
     public async Task<List<Comment>> GetAllByAssetIdAsync(string userId, string assetId)
     {
         // TODO Check if user has access to project
-        return await _context.Comments.AsNoTracking().Where(comment => comment.AssetId == assetId).ToListAsync();
+        return await _context.Comments.AsNoTracking()
+            .Where(comment => comment.Asset != null &&
+                              comment.Asset.Project.Users.Any(u => u.Id == userId))
+            .Where(comment => comment.AssetId == assetId)
+            .ToListAsync();
     }
 
     public async Task<Comment?> GetByIdAsync(string userId, string commentId)
     {
-        return await _context.Comments.AsNoTracking().FirstOrDefaultAsync(comment => comment.Id == commentId);
+        return await _context.Comments.AsNoTracking()
+            .Where(comment => comment.Asset != null &&
+                        comment.Asset.Project.Users.Any(u => u.Id == userId))
+            .FirstOrDefaultAsync(comment => comment.Id == commentId);
     }
 
     public async Task<Comment> AddAsync(Comment comment)

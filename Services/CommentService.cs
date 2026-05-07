@@ -49,6 +49,7 @@ public class CommentService : ICommentService
     {
         Comment? comment = await _repository.GetByIdAsync(userId, commentId);
         if (comment == null) return EntityStatus.NotFound;
+        if (comment.UserId != userId) return EntityStatus.Forbidden;
 
         bool hasChanges = false;
 
