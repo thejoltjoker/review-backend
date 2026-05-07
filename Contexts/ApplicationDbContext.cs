@@ -22,6 +22,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<ProjectUser>(entity =>
         {
             entity.HasKey(projectUser => new { projectUser.ProjectId, projectUser.UserId });
+
+            entity.Property(projectUser => projectUser.ProjectId).IsRequired().HasMaxLength(255);
+            entity.Property(projectUser => projectUser.UserId).IsRequired().HasMaxLength(255);
+            entity.Property(projectUser => projectUser.Role)
+                .IsRequired()
+                .HasConversion<int>();
+
             entity.HasOne(projectUser => projectUser.Project)
                 .WithMany(project => project.ProjectUsers)
                 .HasForeignKey(projectUser => projectUser.ProjectId);
@@ -29,7 +36,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 .WithMany(user => user.ProjectUsers)
                 .HasForeignKey(projectUser => projectUser.UserId);
         });
-
     }
 
     private void SetTimestamps()
