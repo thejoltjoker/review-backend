@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using Review.Api.Models;
 using Review.Api.Models.DTOs;
@@ -25,20 +27,22 @@ public class AssetService : IAssetService
         return _mapper.Map<IEnumerable<AssetDto>>(result);
     }
 
-    public async Task<AssetDto?> GetByIdAsync(string userId, string assetId)
+    public async Task<AssetWithCommentsDto?> GetByIdAsync(string userId, string assetId)
     {
         Asset? result = await _repository.GetByIdAsync(userId, assetId);
-        return _mapper.Map<AssetDto>(result);
+        return _mapper.Map<AssetWithCommentsDto>(result);
     }
 
-    public async Task<AssetDto> CreateAsync(string userId, CreateAssetDto data)
+    public async Task<(EntityStatus Status, AssetDto? Asset)> CreateAsync(string userId, CreateAssetDto data)
     {
-        Asset asset = _mapper.Map<Asset>(data);
-        // TODO check if user on project
+        bool hasAccess = await _projectRepository.ExistsForUserAsync(userId, data.ProjectId);
+        if (!hasAccess) return (EntityStatus.InvalidReference, null);
+        
+        var asset = _mapper.Map<Asset>(data);
         asset.UserId = userId;
         await _repository.AddAsync(asset);
         await _repository.SaveAsync();
-        return _mapper.Map<AssetDto>(asset);
+        return (EntityStatus.Created, _mapper.Map<AssetDto>(asset));
     }
 
     public async Task<EntityStatus> UpdateAsync(string userId, string assetId, UpdateAssetDto data)

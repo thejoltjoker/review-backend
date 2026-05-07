@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Review.Api.Models;
 
 public class Asset : BaseEntity

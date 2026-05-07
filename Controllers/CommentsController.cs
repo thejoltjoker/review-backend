@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -12,68 +11,65 @@ namespace Review.Api.Controllers;
 [ApiController]
 [Route("[controller]")]
 [Authorize(Policy = "ApiKeyOrUser")]
-public class AssetsController : ControllerBase
+public class CommentsController : ControllerBase
 {
-    private readonly IAssetService _service;
+    private readonly ICommentService _service;
 
-    public AssetsController(IAssetService service)
+    public CommentsController(ICommentService service)
     {
         _service = service;
     }
 
+    // TODO Get all by asset id
+    // [HttpGet]
+    // public async Task<ActionResult<IEnumerable<CommentDto>>> GetAll()
+    // {
+    //     string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    //     if (string.IsNullOrEmpty(userId)) return Unauthorized();
+    //
+    //     IEnumerable<CommentDto> result = await _service.GetAllByAssetIdAsync(userId);
+    //     return Ok(result);
+    // }
+
+
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AssetDto>>> GetAll()
+    [Route("{commentId}")]
+    public async Task<ActionResult<CommentDto>> GetById(string commentId)
     {
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        IEnumerable<AssetDto> result = await _service.GetAllAsync(userId);
-        return Ok(result);
-    }
-
-
-    [HttpGet]
-    [Route("{assetId}")]
-    public async Task<ActionResult<AssetWithCommentsDto>> GetById(string assetId)
-    {
-        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId)) return Unauthorized();
-
-        AssetWithCommentsDto? result = await _service.GetByIdAsync(userId, assetId);
+        CommentDto? result = await _service.GetByIdAsync(userId, commentId);
         if (result == null) return NotFound();
         return Ok(result);
     }
 
-
     [HttpPost]
-    public async Task<ActionResult<AssetDto>> Create([FromBody] CreateAssetDto data)
+    public async Task<ActionResult<CommentDto>> Create([FromBody] CreateCommentDto data)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        var result = await _service.CreateAsync(userId, data);
-        if (result.Status == EntityStatus.InvalidReference) return NotFound();
-        if (result.Status == EntityStatus.Created)
-            return CreatedAtAction(
-                nameof(GetById),
-                new { assetId = result.Asset?.Id },
-                result.Asset
-            );
-        return Problem("Something went wrong");
+        CommentDto result = await _service.CreateAsync(userId, data);
+        return CreatedAtAction(
+            nameof(GetById),
+            new { commentId = result.Id },
+            result
+        );
     }
 
     [HttpPut]
-    [Route("{assetId}")]
-    public async Task<ActionResult> Update([FromRoute] string assetId, [FromBody] UpdateAssetDto data)
+    [Route("{commentId}")]
+    public async Task<ActionResult> Update([FromRoute] string commentId, [FromBody] UpdateCommentDto data)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        EntityStatus result = await _service.UpdateAsync(userId, assetId, data);
+        EntityStatus result = await _service.UpdateAsync(userId, commentId, data);
         if (result == EntityStatus.Updated || result == EntityStatus.NoChanges) return NoContent();
         if (result == EntityStatus.NotFound) return NotFound();
         if (result == EntityStatus.Forbidden) return Forbid();
@@ -90,14 +86,13 @@ public class AssetsController : ControllerBase
 
 
     [HttpDelete]
-    [Route("{assetId}")]
-    public async Task<ActionResult> Delete(string assetId)
+    [Route("{commentId}")]
+    public async Task<ActionResult> Delete(string commentId)
     {
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        var result = await _service.DeleteAsync(userId, assetId);
-        // TODO Add more variation to error handling, i.e. unauthorized (because not project owner)
+        var result = await _service.DeleteAsync(userId, commentId);
         if (result == EntityStatus.NotFound) return NotFound();
         if (result == EntityStatus.Deleted) return NoContent();
         return NoContent();

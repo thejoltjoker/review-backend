@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Review.Api.Contexts;
 using Review.Api.Models;
@@ -36,6 +39,15 @@ public class ProjectRepository(ApplicationDbContext context) : IProjectRepositor
             .Include(project => project.Assets)
             .Include(project => project.Users)
             .FirstOrDefaultAsync(p => p.Id == projectId);
+    }
+
+    public async Task<bool> ExistsForUserAsync(string userId, string projectId)
+    {
+        Project? result = await _context.Projects
+            .AsNoTracking()
+            .Where(project => project.Users.Any(user => user.Id == userId))
+            .FirstOrDefaultAsync(project => project.Id == projectId);
+        return result != null;
     }
 
     public async Task<Project> AddAsync(Project project)

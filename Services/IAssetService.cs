@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Review.Api.Models;
 using Review.Api.Models.DTOs;
 
@@ -6,8 +8,8 @@ namespace Review.Api.Services;
 public interface IAssetService
 {
     Task<IEnumerable<AssetDto>> GetAllAsync(string userId);
-    Task<AssetDto?> GetByIdAsync(string userId, string assetId);
-    Task<AssetDto> CreateAsync(string userId, CreateAssetDto data);
+    Task<AssetWithCommentsDto?> GetByIdAsync(string userId, string assetId);
+    Task<(EntityStatus Status, AssetDto? Asset)> CreateAsync(string userId, CreateAssetDto data);
     Task<EntityStatus> UpdateAsync(string userId, string assetId, UpdateAssetDto data);
     Task<EntityStatus> DeleteAsync(string userId, string assetId);
 }

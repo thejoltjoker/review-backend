@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Review.Api.Contexts;
 using Review.Api.Models;
@@ -23,7 +26,8 @@ public class AssetRepository(ApplicationDbContext context) : IAssetRepository
 
 
     public async Task<Asset?> GetByIdAsync(string userId, string assetId) =>
-        await _context.Assets.AsNoTracking()
+        await _context.Assets
+            .Include(asset => asset.Comments)
             .FirstOrDefaultAsync(asset => asset.UserId == userId && asset.Id == assetId);
 
 

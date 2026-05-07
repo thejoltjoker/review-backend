@@ -1,35 +1,43 @@
-@Review.Api_HostAddress = http://localhost:5186
-@Email = john.doe.http@example.com
-@Password = password
-@BearerToken = paste-bearer-token-here
-@ApiKeyToken = paste-api-key-token-here
-@ApiKeyId = paste-api-key-id-here
-@ProjectId = paste-project-id-here
-
 ### Register user
-POST {{Review.Api_HostAddress}}/register
+# @name registerUser
+POST {{Review_Api_HostAddress}}/register
 Content-Type: application/json
 
 {
   "email": "{{Email}}",
   "password": "{{Password}}"
 }
+
+> {%
+  client.test("registerUser status is 200 or 400", function () {
+    client.assert(response.status === 200 || response.status === 400, "Expected 200 OK (new user) or 400 Bad Request (already exists)");
+  });
+%}
 
 ###
 
-### Login (copy accessToken from response into @BearerToken)
-POST {{Review.Api_HostAddress}}/login?useCookies=false
+### Login (stores accessToken into global BearerToken for next requests)
+# @name loginUser
+POST {{Review_Api_HostAddress}}/login?useCookies=false
 Content-Type: application/json
 
 {
   "email": "{{Email}}",
   "password": "{{Password}}"
 }
+
+> {%
+  client.test("loginUser status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+  client.global.set("BearerToken", response.body.accessToken);
+%}
 
 ###
 
 ### Create API key (requires bearer token)
-POST {{Review.Api_HostAddress}}/ApiKeys
+# @name createApiKey
+POST {{Review_Api_HostAddress}}/ApiKeys
 Authorization: Bearer {{BearerToken}}
 Content-Type: application/json
 
@@ -37,37 +45,33 @@ Content-Type: application/json
   "name": "My first API key"
 }
 
+> {%
+  client.test("createApiKey status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
+  client.global.set("ApiKeyToken", response.body.token);
+  client.global.set("ApiKeyId", response.body.token.split(".")[0]);
+%}
+
 ###
 
 ### List API keys (requires bearer token)
-GET {{Review.Api_HostAddress}}/ApiKeys
+# @name listApiKeys
+GET {{Review_Api_HostAddress}}/ApiKeys
 Authorization: Bearer {{BearerToken}}
 Accept: application/json
 
-###
-
-### Revoke API key (requires bearer token)
-DELETE {{Review.Api_HostAddress}}/ApiKeys/{{ApiKeyId}}
-Authorization: Bearer {{BearerToken}}
-
-###
-
-### Get all projects (auth with API key)
-GET {{Review.Api_HostAddress}}/Projects
-Authorization: ApiKey {{ApiKeyToken}}
-Accept: application/json
-
-###
-
-### Get project by id (auth with API key)
-GET {{Review.Api_HostAddress}}/Projects/{{ProjectId}}
-Authorization: ApiKey {{ApiKeyToken}}
-Accept: application/json
+> {%
+  client.test("listApiKeys status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
 
 ###
 
 ### Create project (auth with API key)
-POST {{Review.Api_HostAddress}}/Projects
+# @name createProject
+POST {{Review_Api_HostAddress}}/Projects
 Authorization: ApiKey {{ApiKeyToken}}
 Content-Type: application/json
 
@@ -75,10 +79,46 @@ Content-Type: application/json
   "name": "New demo project"
 }
 
+> {%
+  client.test("createProject status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
+  client.global.set("ProjectId", response.body.id);
+%}
+
+###
+
+### Get all projects (auth with API key)
+# @name listProjects
+GET {{Review_Api_HostAddress}}/Projects
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("listProjects status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
+
+###
+
+### Get project by id (auth with API key)
+# @name getProjectById
+GET {{Review_Api_HostAddress}}/Projects/{{ProjectId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("getProjectById status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
+
 ###
 
 ### Update project (auth with API key)
-PUT {{Review.Api_HostAddress}}/Projects/{{ProjectId}}
+# @name updateProject
+PUT {{Review_Api_HostAddress}}/Projects/{{ProjectId}}
 Authorization: ApiKey {{ApiKeyToken}}
 Content-Type: application/json
 
@@ -86,8 +126,464 @@ Content-Type: application/json
   "name": "Updated demo project"
 }
 
+> {%
+  client.test("updateProject status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
+###
+
+### Create asset (auth with API key)
+# @name createAsset
+POST {{Review_Api_HostAddress}}/Assets
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "fileName": "clip.mp4",
+  "fileUrl": "https://example.com/files/clip.mp4",
+  "fileType": "video/mp4",
+  "projectId": "{{ProjectId}}"
+}
+
+> {%
+  client.test("createAsset status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
+  client.global.set("AssetId", response.body.id);
+%}
+
+###
+
+### Get all assets (auth with API key)
+# @name listAssets
+GET {{Review_Api_HostAddress}}/Assets
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("listAssets status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
+
+###
+
+### Get asset by id (includes comments, auth with API key)
+# @name getAssetById
+GET {{Review_Api_HostAddress}}/Assets/{{AssetId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("getAssetById status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
+
+###
+
+### Update asset (auth with API key)
+# @name updateAsset
+PUT {{Review_Api_HostAddress}}/Assets/{{AssetId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "fileName": "clip-v2.mp4",
+  "fileUrl": "https://example.com/files/clip-v2.mp4",
+  "fileType": "video/mp4",
+  "projectId": "{{ProjectId}}"
+}
+
+> {%
+  client.test("updateAsset status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
+###
+
+### Create comment (auth with API key)
+# @name createComment
+POST {{Review_Api_HostAddress}}/Comments
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "content": "Start of intro section",
+  "timestampSeconds": 12.5,
+  "assetId": "{{AssetId}}",
+  "userId": "ignored-by-server"
+}
+
+> {%
+  client.test("createComment status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
+  client.global.set("CommentId", response.body.id);
+%}
+
+###
+
+### Get comment by id (auth with API key)
+# @name getCommentById
+GET {{Review_Api_HostAddress}}/Comments/{{CommentId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("getCommentById status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+%}
+
+###
+
+### Update comment (auth with API key)
+# @name updateComment
+PUT {{Review_Api_HostAddress}}/Comments/{{CommentId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "content": "Updated comment text",
+  "timestampSeconds": 13.2
+}
+
+> {%
+  client.test("updateComment status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
+###
+
+### Delete comment (auth with API key)
+# @name deleteComment
+DELETE {{Review_Api_HostAddress}}/Comments/{{CommentId}}
+Authorization: ApiKey {{ApiKeyToken}}
+
+> {%
+  client.test("deleteComment status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
+###
+
+### Status coverage: 400 (validation) - create project with invalid payload
+# @name createProjectValidation400
+POST {{Review_Api_HostAddress}}/Projects
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "name": "a"
+}
+
+> {%
+  client.test("createProjectValidation400 status is 400", function () {
+    client.assert(response.status === 400, "Expected 400 Bad Request");
+  });
+%}
+
+###
+
+### Status coverage: 400 (validation) - create asset with invalid payload
+# @name createAssetValidation400
+POST {{Review_Api_HostAddress}}/Assets
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "fileName": "clip.mp4",
+  "fileUrl": "not-a-url",
+  "fileType": "video/mp4",
+  "projectId": "{{ProjectId}}"
+}
+
+> {%
+  client.test("createAssetValidation400 status is 400", function () {
+    client.assert(response.status === 400, "Expected 400 Bad Request");
+  });
+%}
+
+###
+
+### Status coverage: 401 (missing auth) - list projects without token
+# @name listProjectsUnauthorized401
+GET {{Review_Api_HostAddress}}/Projects
+Accept: application/json
+
+> {%
+  client.test("listProjectsUnauthorized401 status is 401", function () {
+    client.assert(response.status === 401, "Expected 401 Unauthorized");
+  });
+%}
+
+###
+
+### Status coverage: 404 (not found) - get missing project
+# @name getMissingProject404
+GET {{Review_Api_HostAddress}}/Projects/00000000-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("getMissingProject404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Status coverage: 404 (not found) - get missing asset
+# @name getMissingAsset404
+GET {{Review_Api_HostAddress}}/Assets/00000000-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("getMissingAsset404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Status coverage: 404 (not found) - get missing comment
+# @name getMissingComment404
+GET {{Review_Api_HostAddress}}/Comments/COMMENT0-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+Accept: application/json
+
+> {%
+  client.test("getMissingComment404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Comment status coverage: 400 (validation) - create comment invalid payload
+# @name createCommentValidation400
+POST {{Review_Api_HostAddress}}/Comments
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "content": "",
+  "timestampSeconds": -1,
+  "assetId": "{{AssetId}}",
+  "userId": "ignored-by-server"
+}
+
+> {%
+  client.test("createCommentValidation400 status is 400", function () {
+    client.assert(response.status === 400, "Expected 400 Bad Request");
+  });
+%}
+
+###
+
+### Comment status coverage: 400 (validation) - update comment invalid payload
+# @name updateCommentValidation400
+PUT {{Review_Api_HostAddress}}/Comments/{{CommentId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "content": "",
+  "timestampSeconds": -1
+}
+
+> {%
+  client.test("updateCommentValidation400 status is 400", function () {
+    client.assert(response.status === 400, "Expected 400 Bad Request");
+  });
+%}
+
+###
+
+### Comment status coverage: 401 (missing auth) - get comment without token
+# @name getCommentUnauthorized401
+GET {{Review_Api_HostAddress}}/Comments/{{CommentId}}
+Accept: application/json
+
+> {%
+  client.test("getCommentUnauthorized401 status is 401", function () {
+    client.assert(response.status === 401, "Expected 401 Unauthorized");
+  });
+%}
+
+###
+
+### Comment status coverage: 404 (not found) - update missing comment
+# @name updateMissingComment404
+PUT {{Review_Api_HostAddress}}/Comments/COMMENT0-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "content": "will not update",
+  "timestampSeconds": 1
+}
+
+> {%
+  client.test("updateMissingComment404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Comment status coverage: 404 (not found) - delete missing comment
+# @name deleteMissingComment404
+DELETE {{Review_Api_HostAddress}}/Comments/COMMENT0-0000-0000-0000-000000000000
+Authorization: ApiKey {{ApiKeyToken}}
+
+> {%
+  client.test("deleteMissingComment404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Status coverage: 422 (invalid reference) - move asset to missing project
+# @name updateAssetInvalidReference422
+PUT {{Review_Api_HostAddress}}/Assets/{{AssetId}}
+Authorization: ApiKey {{ApiKeyToken}}
+Content-Type: application/json
+
+{
+  "fileName": "clip-v3.mp4",
+  "fileUrl": "https://example.com/files/clip-v3.mp4",
+  "fileType": "video/mp4",
+  "projectId": "00000000-0000-0000-0000-000000000000"
+}
+
+> {%
+  client.test("updateAssetInvalidReference422 status is 422", function () {
+    client.assert(response.status === 422, "Expected 422 Unprocessable Entity");
+  });
+%}
+
+###
+
+### Secondary user for 403 coverage: register (allow reruns)
+# @name registerOtherUser
+POST {{Review_Api_HostAddress}}/register
+Content-Type: application/json
+
+{
+  "email": "{{OtherEmail}}",
+  "password": "{{OtherPassword}}"
+}
+
+> {%
+  client.test("registerOtherUser status is 200 or 400", function () {
+    client.assert(response.status === 200 || response.status === 400, "Expected 200 OK (new user) or 400 Bad Request (already exists)");
+  });
+%}
+
+###
+
+### Secondary user for 403 coverage: login
+# @name loginOtherUser
+POST {{Review_Api_HostAddress}}/login?useCookies=false
+Content-Type: application/json
+
+{
+  "email": "{{OtherEmail}}",
+  "password": "{{OtherPassword}}"
+}
+
+> {%
+  client.test("loginOtherUser status is 200", function () {
+    client.assert(response.status === 200, "Expected 200 OK");
+  });
+  client.global.set("OtherBearerToken", response.body.accessToken);
+%}
+
+###
+
+### Secondary user for 403 coverage: create API key
+# @name createOtherApiKey
+POST {{Review_Api_HostAddress}}/ApiKeys
+Authorization: Bearer {{OtherBearerToken}}
+Content-Type: application/json
+
+{
+  "name": "Other user key"
+}
+
+> {%
+  client.test("createOtherApiKey status is 201", function () {
+    client.assert(response.status === 201, "Expected 201 Created");
+  });
+  client.global.set("OtherApiKeyToken", response.body.token);
+%}
+
+###
+
+### Status coverage: 404 (resource hidden across users) - other user updates your asset
+# @name updateAssetCrossUser404
+PUT {{Review_Api_HostAddress}}/Assets/{{AssetId}}
+Authorization: ApiKey {{OtherApiKeyToken}}
+Content-Type: application/json
+
+{
+  "fileName": "clip-should-fail.mp4",
+  "fileUrl": "https://example.com/files/clip-should-fail.mp4",
+  "fileType": "video/mp4",
+  "projectId": "{{ProjectId}}"
+}
+
+> {%
+  client.test("updateAssetCrossUser404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Delete asset (auth with API key)
+# @name deleteAsset
+DELETE {{Review_Api_HostAddress}}/Assets/{{AssetId}}
+Authorization: ApiKey {{ApiKeyToken}}
+
+> {%
+  client.test("deleteAsset status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
 ###
 
 ### Delete project (auth with API key)
-DELETE {{Review.Api_HostAddress}}/Projects/{{ProjectId}}
+# @name deleteProject
+DELETE {{Review_Api_HostAddress}}/Projects/{{ProjectId}}
 Authorization: ApiKey {{ApiKeyToken}}
+
+> {%
+  client.test("deleteProject status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
+###
+
+### Revoke API key (requires bearer token)
+# @name revokeApiKey
+DELETE {{Review_Api_HostAddress}}/ApiKeys/{{ApiKeyId}}
+Authorization: Bearer {{BearerToken}}
+
+> {%
+  client.test("revokeApiKey status is 204", function () {
+    client.assert(response.status === 204, "Expected 204 No Content");
+  });
+%}
+
