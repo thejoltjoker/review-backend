@@ -32,6 +32,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#7](https://github.com/thejoltjoker/review-backend/pull/7)
 - Add better documentation to README and http file
   [#8](https://github.com/thejoltjoker/review-backend/pull/8)
+- Add `CreatedByUserId` to `Project` entity
+  [#13](https://github.com/thejoltjoker/review-backend/pull/13)
 
 ### Deprecated
 

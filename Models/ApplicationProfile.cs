@@ -9,7 +9,6 @@ public class ApplicationProfile : Profile
     {
         CreateMap<Project, ProjectDto>();
         CreateMap<Project, ProjectWithAssetsDto>();
-        CreateMap<CreateProjectDto, Project>();
         CreateMap<UpdateProjectDto, Project>();
         CreateMap<Comment, CommentDto>();
         CreateMap<CreateCommentDto, Comment>();
