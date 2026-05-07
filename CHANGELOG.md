@@ -21,6 +21,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#6](https://github.com/thejoltjoker/review-backend/pull/6)
 - Implement CRUD functionality for `Asset` entity
   [#9](https://github.com/thejoltjoker/review-backend/pull/9)
+- Implement CRUD functionality for `Comment` entity
+  [#11](https://github.com/thejoltjoker/review-backend/pull/11)
 
 ### Changed
 
