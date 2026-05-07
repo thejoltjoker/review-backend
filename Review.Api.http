@@ -529,8 +529,8 @@ Content-Type: application/json
 
 ###
 
-### Status coverage: 403 (forbidden) - other user updates your asset
-# @name updateAssetForbidden403
+### Status coverage: 404 (resource hidden across users) - other user updates your asset
+# @name updateAssetCrossUser404
 PUT {{Review_Api_HostAddress}}/Assets/{{AssetId}}
 Authorization: ApiKey {{OtherApiKeyToken}}
 Content-Type: application/json
@@ -543,8 +543,8 @@ Content-Type: application/json
 }
 
 > {%
-  client.test("updateAssetForbidden403 status is 403", function () {
-    client.assert(response.status === 403, "Expected 403 Forbidden");
+  client.test("updateAssetCrossUser404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
   });
 %}
 
