@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Review.Api.Models;
@@ -16,11 +13,38 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<User> Users { get; set; }
 
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<ProjectUser>(entity =>
+        {
+            entity.HasKey(projectUser => new { projectUser.ProjectId, projectUser.UserId });
+
+            entity.Property(projectUser => projectUser.ProjectId).IsRequired().HasMaxLength(255);
+            entity.Property(projectUser => projectUser.UserId).IsRequired().HasMaxLength(255);
+            entity.Property(projectUser => projectUser.Role)
+                .IsRequired()
+                .HasConversion<string>();
+
+            entity.HasIndex(projectUser => projectUser.UserId);
+
+            entity.HasOne(projectUser => projectUser.Project)
+                .WithMany(project => project.ProjectUsers)
+                .HasForeignKey(projectUser => projectUser.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(projectUser => projectUser.User)
+                .WithMany(user => user.ProjectUsers)
+                .HasForeignKey(projectUser => projectUser.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+    }
+
     private void SetTimestamps()
     {
         DateTime now = DateTime.UtcNow;
 
-        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        foreach (var entry in ChangeTracker.Entries<IHasTimestamps>())
         {
             if (entry.State == EntityState.Added)
             {
@@ -28,6 +52,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 {
                     entry.Entity.CreatedAt = now;
                 }
+
                 entry.Entity.UpdatedAt = now;
             }
             else if (entry.State == EntityState.Modified)

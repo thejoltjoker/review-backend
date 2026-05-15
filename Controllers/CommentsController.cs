@@ -52,11 +52,15 @@ public class CommentsController : ControllerBase
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        CommentDto result = await _service.CreateAsync(userId, data);
+        var result = await _service.CreateAsync(userId, data);
+        if (result.Status == EntityStatus.InvalidReference) return NotFound();
+        if (result.Status == EntityStatus.Forbidden) return Forbid();
+        if (result.Status != EntityStatus.Created || result.Comment == null) return Problem("Something went wrong");
+
         return CreatedAtAction(
             nameof(GetById),
-            new { commentId = result.Id },
-            result
+            new { commentId = result.Comment.Id },
+            result.Comment
         );
     }
 
@@ -94,7 +98,13 @@ public class CommentsController : ControllerBase
 
         var result = await _service.DeleteAsync(userId, commentId);
         if (result == EntityStatus.NotFound) return NotFound();
+        if (result == EntityStatus.Forbidden) return Forbid();
+        if (result == EntityStatus.InvalidReference)
+            return UnprocessableEntity(new
+            {
+                message = "Referenced entity does not exist or is inaccessible."
+            });
         if (result == EntityStatus.Deleted) return NoContent();
-        return NoContent();
+        return Problem("Something went wrong");
     }
 }

@@ -11,13 +11,19 @@ public class AssetService : IAssetService
 {
     private readonly IAssetRepository _repository;
     private readonly IProjectRepository _projectRepository;
+    private readonly IProjectAuthorizationService _projectAuthorizationService;
     private readonly IMapper _mapper;
 
 
-    public AssetService(IAssetRepository repository, IProjectRepository projectRepository, IMapper mapper)
+    public AssetService(
+        IAssetRepository repository,
+        IProjectRepository projectRepository,
+        IProjectAuthorizationService projectAuthorizationService,
+        IMapper mapper)
     {
         _repository = repository;
         _projectRepository = projectRepository;
+        _projectAuthorizationService = projectAuthorizationService;
         _mapper = mapper;
     }
 
@@ -37,7 +43,11 @@ public class AssetService : IAssetService
     {
         bool hasAccess = await _projectRepository.ExistsForUserAsync(userId, data.ProjectId);
         if (!hasAccess) return (EntityStatus.InvalidReference, null);
-        
+
+        bool canUpdateProject =
+            await _projectAuthorizationService.CanAsync(userId, data.ProjectId, ProjectPermission.Update);
+        if (!canUpdateProject) return (EntityStatus.Forbidden, null);
+
         var asset = _mapper.Map<Asset>(data);
         asset.UserId = userId;
         await _repository.AddAsync(asset);
@@ -49,6 +59,10 @@ public class AssetService : IAssetService
     {
         Asset? asset = await _repository.GetByIdAsync(userId, assetId);
         if (asset == null) return EntityStatus.NotFound;
+
+        bool canUpdateCurrentProject =
+            await _projectAuthorizationService.CanAsync(userId, asset.ProjectId, ProjectPermission.Update);
+        if (!canUpdateCurrentProject) return EntityStatus.Forbidden;
 
         bool hasChanges = false;
 
@@ -74,6 +88,11 @@ public class AssetService : IAssetService
         {
             Project? project = await _projectRepository.GetByIdForUserAsync(userId, data.ProjectId);
             if (project == null) return EntityStatus.InvalidReference;
+
+            bool canUpdateDestinationProject =
+                await _projectAuthorizationService.CanAsync(userId, data.ProjectId, ProjectPermission.Update);
+            if (!canUpdateDestinationProject) return EntityStatus.Forbidden;
+
             asset.ProjectId = data.ProjectId;
             hasChanges = true;
         }
@@ -89,6 +108,11 @@ public class AssetService : IAssetService
     {
         var asset = await _repository.GetByIdAsync(userId, assetId);
         if (asset == null) return EntityStatus.NotFound;
+
+        bool canUpdateProject =
+            await _projectAuthorizationService.CanAsync(userId, asset.ProjectId, ProjectPermission.Update);
+        if (!canUpdateProject) return EntityStatus.Forbidden;
+
         _repository.Delete(asset);
         await _repository.SaveAsync();
         return EntityStatus.Deleted;

@@ -6,7 +6,7 @@ namespace Review.Api.Models;
 public class User : IdentityUser
 {
     public ICollection<ApiKey> ApiKeys { get; } = new List<ApiKey>();
-    public List<Project> Projects { get; } = [];
+    public List<ProjectUser> ProjectUsers { get; } = [];
     public ICollection<Asset> Assets { get; } = new List<Asset>(); 
     public ICollection<Comment> Comments { get; } = new List<Comment>();
 

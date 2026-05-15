@@ -21,7 +21,7 @@ public class ProjectRepository(ApplicationDbContext context) : IProjectRepositor
     public async Task<List<Project>> GetAllByUserIdAsync(string userId)
     {
         return await _context.Projects
-            .Where(p => p.Users.Any(u => u.Id == userId))
+            .Where(p => p.ProjectUsers.Any(u => u.UserId == userId))
             .Include(project => project.Assets)
             .ToListAsync();
     }
@@ -29,15 +29,17 @@ public class ProjectRepository(ApplicationDbContext context) : IProjectRepositor
     public async Task<Project?> GetByIdAsync(string projectId) =>
         await _context.Projects
             .Include(project => project.Assets)
-            .Include(project => project.Users)
+            .Include(project => project.ProjectUsers)
+            .ThenInclude(projectUser => projectUser.User)
             .FirstOrDefaultAsync(p => p.Id == projectId);
 
     public async Task<Project?> GetByIdForUserAsync(string userId, string projectId)
     {
         return await _context.Projects
-            .Where(p => p.Users.Any(u => u.Id == userId))
+            .Where(p => p.ProjectUsers.Any(u => u.UserId == userId))
             .Include(project => project.Assets)
-            .Include(project => project.Users)
+            .Include(project => project.ProjectUsers)
+            .ThenInclude(projectUser => projectUser.User)
             .FirstOrDefaultAsync(p => p.Id == projectId);
     }
 
@@ -45,7 +47,7 @@ public class ProjectRepository(ApplicationDbContext context) : IProjectRepositor
     {
         Project? result = await _context.Projects
             .AsNoTracking()
-            .Where(project => project.Users.Any(user => user.Id == userId))
+            .Where(project => project.ProjectUsers.Any(projectUser => projectUser.UserId == userId))
             .FirstOrDefaultAsync(project => project.Id == projectId);
         return result != null;
     }

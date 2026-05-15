@@ -12,8 +12,9 @@ public class Project : BaseEntity
 
     public string Name { get; set; }
     public string CreatedByUserId { get; set; }
+    
+    public List<ProjectUser> ProjectUsers { get; } = [];
 
-    public List<User> Users { get; } = [];
 
     public ICollection<Asset> Assets { get; } = new List<Asset>();
 }

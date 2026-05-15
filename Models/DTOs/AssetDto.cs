@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Review.Api.Models.DTOs;
@@ -12,7 +10,7 @@ public class AssetDto
     public string FileType { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; }
-    public string ProjectId { get; set; }
+    public string ProjectId { get; set; } = string.Empty;
 }
 
 public class AssetWithCommentsDto
@@ -23,9 +21,9 @@ public class AssetWithCommentsDto
     public string FileType { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; }
-    public string ProjectId { get; set; }
+    public string ProjectId { get; set; } = string.Empty;
 
-    public List<CommentDto> Comments { get; set; }
+    public List<CommentDto> Comments { get; set; } = [];
 }
 
 public class CreateAssetDto

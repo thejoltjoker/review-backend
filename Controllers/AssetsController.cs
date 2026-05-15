@@ -55,6 +55,7 @@ public class AssetsController : ControllerBase
 
         var result = await _service.CreateAsync(userId, data);
         if (result.Status == EntityStatus.InvalidReference) return NotFound();
+        if (result.Status == EntityStatus.Forbidden) return Forbid();
         if (result.Status == EntityStatus.Created)
             return CreatedAtAction(
                 nameof(GetById),
@@ -97,9 +98,9 @@ public class AssetsController : ControllerBase
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
         var result = await _service.DeleteAsync(userId, assetId);
-        // TODO Add more variation to error handling, i.e. unauthorized (because not project owner)
         if (result == EntityStatus.NotFound) return NotFound();
+        if (result == EntityStatus.Forbidden) return Forbid();
         if (result == EntityStatus.Deleted) return NoContent();
-        return NoContent();
+        return Problem("Something went wrong");
     }
 }

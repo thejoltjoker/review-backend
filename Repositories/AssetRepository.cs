@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Review.Api.Contexts;
 using Review.Api.Models;
@@ -19,16 +16,18 @@ public class AssetRepository(ApplicationDbContext context) : IAssetRepository
 
     public async Task<List<Asset>> GetAllByProjectIdAsync(string userId, string projectId) =>
         await _context.Assets.AsNoTracking()
+            // TODO Add role-aware filtering when read access should differ by project role.
             .Where(asset => asset.ProjectId == projectId &&
-                            asset.Project != null &&
-                            asset.Project.Users.Any(p => p.Id == userId))
+                            asset.Project.ProjectUsers.Any(p => p.UserId == userId))
             .ToListAsync();
 
 
     public async Task<Asset?> GetByIdAsync(string userId, string assetId) =>
         await _context.Assets
             .Include(asset => asset.Comments)
-            .FirstOrDefaultAsync(asset => asset.UserId == userId && asset.Id == assetId);
+            .FirstOrDefaultAsync(asset =>
+                asset.Id == assetId &&
+                asset.Project.ProjectUsers.Any(projectUser => projectUser.UserId == userId));
 
 
     public async Task<Asset> AddAsync(Asset asset)

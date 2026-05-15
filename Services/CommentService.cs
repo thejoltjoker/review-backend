@@ -13,13 +13,19 @@ public class CommentService : ICommentService
 {
     private readonly ICommentRepository _repository;
     private readonly IAssetRepository _assetRepository;
+    private readonly IProjectAuthorizationService _projectAuthorizationService;
     private readonly IMapper _mapper;
 
 
-    public CommentService(ICommentRepository repository, IAssetRepository assetRepository, IMapper mapper)
+    public CommentService(
+        ICommentRepository repository,
+        IAssetRepository assetRepository,
+        IProjectAuthorizationService projectAuthorizationService,
+        IMapper mapper)
     {
         _repository = repository;
         _assetRepository = assetRepository;
+        _projectAuthorizationService = projectAuthorizationService;
         _mapper = mapper;
     }
 
@@ -36,20 +42,36 @@ public class CommentService : ICommentService
         return _mapper.Map<CommentDto>(comment);
     }
 
-    public async Task<CommentDto> CreateAsync(string userId, CreateCommentDto data)
+    public async Task<(EntityStatus Status, CommentDto? Comment)> CreateAsync(string userId, CreateCommentDto data)
     {
+        var asset = await _assetRepository.GetByIdAsync(userId, data.AssetId);
+        if (asset == null) return (EntityStatus.InvalidReference, null);
+
+        bool canReadProject =
+            await _projectAuthorizationService.CanAsync(userId, asset.ProjectId, ProjectPermission.Read);
+        if (!canReadProject) return (EntityStatus.Forbidden, null);
+
         Comment comment = _mapper.Map<Comment>(data);
         comment.UserId = userId;
         await _repository.AddAsync(comment);
         await _repository.SaveAsync();
-        return _mapper.Map<CommentDto>(comment);
+        return (EntityStatus.Created, _mapper.Map<CommentDto>(comment));
     }
 
     public async Task<EntityStatus> UpdateAsync(string userId, string commentId, UpdateCommentDto data)
     {
         Comment? comment = await _repository.GetByIdAsync(userId, commentId);
         if (comment == null) return EntityStatus.NotFound;
-        if (comment.UserId != userId) return EntityStatus.Forbidden;
+
+        var asset = await _assetRepository.GetByIdAsync(userId, comment.AssetId);
+        if (asset == null) return EntityStatus.InvalidReference;
+
+        if (comment.UserId != userId)
+        {
+            bool canUpdateProject =
+                await _projectAuthorizationService.CanAsync(userId, asset.ProjectId, ProjectPermission.Update);
+            if (!canUpdateProject) return EntityStatus.Forbidden;
+        }
 
         bool hasChanges = false;
 
@@ -59,13 +81,13 @@ public class CommentService : ICommentService
             hasChanges = true;
         }
 
-        
+
         if (Math.Abs(data.TimestampSeconds - comment.TimestampSeconds) > 0.001f)
         {
             comment.TimestampSeconds = data.TimestampSeconds;
             hasChanges = true;
         }
-        
+
         if (!hasChanges) return EntityStatus.NoChanges;
 
         _repository.Update(comment);
@@ -77,6 +99,17 @@ public class CommentService : ICommentService
     {
         var comment = await _repository.GetByIdAsync(userId, commentId);
         if (comment == null) return EntityStatus.NotFound;
+
+        var asset = await _assetRepository.GetByIdAsync(userId, comment.AssetId);
+        if (asset == null) return EntityStatus.InvalidReference;
+
+        if (comment.UserId != userId)
+        {
+            bool canUpdateProject =
+                await _projectAuthorizationService.CanAsync(userId, asset.ProjectId, ProjectPermission.Update);
+            if (!canUpdateProject) return EntityStatus.Forbidden;
+        }
+
         _repository.Delete(comment);
         await _repository.SaveAsync();
         return EntityStatus.Deleted;
