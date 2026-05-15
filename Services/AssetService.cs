@@ -35,6 +35,7 @@ public class AssetService : IAssetService
 
     public async Task<(EntityStatus Status, AssetDto? Asset)> CreateAsync(string userId, CreateAssetDto data)
     {
+        // TODO Enforce role check (Owner/Editor) before allowing asset creation in a project.
         bool hasAccess = await _projectRepository.ExistsForUserAsync(userId, data.ProjectId);
         if (!hasAccess) return (EntityStatus.InvalidReference, null);
         
@@ -47,6 +48,7 @@ public class AssetService : IAssetService
 
     public async Task<EntityStatus> UpdateAsync(string userId, string assetId, UpdateAssetDto data)
     {
+        // TODO Enforce role check (Owner/Editor) instead of relying on asset ownership.
         Asset? asset = await _repository.GetByIdAsync(userId, assetId);
         if (asset == null) return EntityStatus.NotFound;
 
@@ -72,6 +74,7 @@ public class AssetService : IAssetService
 
         if (!string.IsNullOrWhiteSpace(data.ProjectId) && data.ProjectId != asset.ProjectId)
         {
+            // TODO Enforce role check (Owner/Editor) in destination project before reassigning asset.
             Project? project = await _projectRepository.GetByIdForUserAsync(userId, data.ProjectId);
             if (project == null) return EntityStatus.InvalidReference;
             asset.ProjectId = data.ProjectId;
@@ -87,6 +90,7 @@ public class AssetService : IAssetService
 
     public async Task<EntityStatus> DeleteAsync(string userId, string assetId)
     {
+        // TODO Enforce role check (Owner/Editor) instead of relying on asset ownership.
         var asset = await _repository.GetByIdAsync(userId, assetId);
         if (asset == null) return EntityStatus.NotFound;
         _repository.Delete(asset);

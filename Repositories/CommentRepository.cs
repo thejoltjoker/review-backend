@@ -13,7 +13,7 @@ public class CommentRepository(ApplicationDbContext context) : ICommentRepositor
 
     public async Task<List<Comment>> GetAllByAssetIdAsync(string userId, string assetId)
     {
-        // TODO Check if user has access to project
+        // TODO Add role-aware filtering when comment permissions depend on project role.
         return await _context.Comments.AsNoTracking()
             .Where(comment => comment.Asset != null &&
                               comment.Asset.Project.ProjectUsers.Any(u => u.UserId == userId))
@@ -24,6 +24,7 @@ public class CommentRepository(ApplicationDbContext context) : ICommentRepositor
     public async Task<Comment?> GetByIdAsync(string userId, string commentId)
     {
         return await _context.Comments.AsNoTracking()
+            // TODO Add role-aware filtering when comment permissions depend on project role.
             .Where(comment => comment.Asset != null &&
                         comment.Asset.Project.ProjectUsers.Any(u => u.UserId == userId))
             .FirstOrDefaultAsync(comment => comment.Id == commentId);

@@ -57,19 +57,23 @@ public class ProjectService : IProjectService
         return _mapper.Map<ProjectDto>(result);
     }
 
-    public async Task<bool> UpdateAsync(string userId, string projectId, UpdateProjectDto data)
+    public async Task<EntityStatus> UpdateAsync(string userId, string projectId, UpdateProjectDto data)
     {
+        // TODO Enforce role check (Owner/Editor) before allowing project updates.
         var existing = await _projectRepository.GetByIdForUserAsync(userId, projectId);
-        if (existing == null) return false;
+        if (existing == null) return EntityStatus.NotFound;
+        var projectUser = existing.ProjectUsers.FirstOrDefault(pu => pu.UserId == userId);
+        if (projectUser == null || !(projectUser.Role == ProjectUserRole.Owner || projectUser.Role == ProjectUserRole.Editor))
+            return EntityStatus.Forbidden;
         existing.Name = data.Name;
         _projectRepository.Update(existing);
         await _projectRepository.SaveAsync();
-        return true;
+        return EntityStatus.Updated;
     }
 
     public async Task<bool> DeleteAsync(string userId, string projectId)
     {
-        // TODO Enforce that only the owner tied to the validated API key can delete this project.
+        // TODO Enforce role check (Owner only) before allowing project deletion.
         var project = await _projectRepository.GetByIdForUserAsync(userId, projectId);
         if (project == null) return false;
         _projectRepository.Delete(project);

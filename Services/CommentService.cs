@@ -38,6 +38,7 @@ public class CommentService : ICommentService
 
     public async Task<CommentDto> CreateAsync(string userId, CreateCommentDto data)
     {
+        // TODO Enforce role check (Owner/Editor) before allowing comment creation.
         Comment comment = _mapper.Map<Comment>(data);
         comment.UserId = userId;
         await _repository.AddAsync(comment);
@@ -47,6 +48,7 @@ public class CommentService : ICommentService
 
     public async Task<EntityStatus> UpdateAsync(string userId, string commentId, UpdateCommentDto data)
     {
+        // TODO Enforce role check (Owner/Editor) for comment updates at project level.
         Comment? comment = await _repository.GetByIdAsync(userId, commentId);
         if (comment == null) return EntityStatus.NotFound;
         if (comment.UserId != userId) return EntityStatus.Forbidden;
@@ -75,6 +77,7 @@ public class CommentService : ICommentService
 
     public async Task<EntityStatus> DeleteAsync(string userId, string commentId)
     {
+        // TODO Enforce role check (Owner/Editor) for comment deletion at project level.
         var comment = await _repository.GetByIdAsync(userId, commentId);
         if (comment == null) return EntityStatus.NotFound;
         _repository.Delete(comment);

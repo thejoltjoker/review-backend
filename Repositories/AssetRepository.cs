@@ -16,6 +16,7 @@ public class AssetRepository(ApplicationDbContext context) : IAssetRepository
 
     public async Task<List<Asset>> GetAllByProjectIdAsync(string userId, string projectId) =>
         await _context.Assets.AsNoTracking()
+            // TODO Add role-aware filtering when read access should differ by project role.
             .Where(asset => asset.ProjectId == projectId &&
                             asset.Project.ProjectUsers.Any(p => p.UserId == userId))
             .ToListAsync();

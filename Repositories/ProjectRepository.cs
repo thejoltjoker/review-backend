@@ -39,7 +39,7 @@ public class ProjectRepository(ApplicationDbContext context) : IProjectRepositor
             .Where(p => p.ProjectUsers.Any(u => u.UserId == userId))
             .Include(project => project.Assets)
             .Include(project => project.ProjectUsers)
-            .ThenInclude(projectUser=>projectUser.User)
+            .ThenInclude(projectUser => projectUser.User)
             .FirstOrDefaultAsync(p => p.Id == projectId);
     }
 

@@ -50,7 +50,7 @@ public class ProjectsController : ControllerBase
 
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
-        
+
         var result = await _service.CreateAsync(userId, data);
 
         return CreatedAtAction(nameof(GetById), new { projectId = result.Id }, result);
@@ -66,9 +66,11 @@ public class ProjectsController : ControllerBase
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
         var result = await _service.UpdateAsync(userId, projectId, data);
-        if (!result) return NotFound($"Project {projectId} not found");
+        if (result == EntityStatus.NotFound) return NotFound($"Project {projectId} not found");
+        if (result == EntityStatus.Forbidden) return Forbid();
+        if (result == EntityStatus.Updated) return NoContent();
 
-        return NoContent();
+        return Problem("Something went wrong");
     }
 
     [HttpDelete]
