@@ -25,8 +25,9 @@ public class CommentRepository(ApplicationDbContext context) : ICommentRepositor
     {
         return await _context.Comments.AsNoTracking()
             // TODO Add role-aware filtering when comment permissions depend on project role.
+            // .Include(comment => comment.Asset!.ProjectId)
             .Where(comment => comment.Asset != null &&
-                        comment.Asset.Project.ProjectUsers.Any(u => u.UserId == userId))
+                              comment.Asset.Project.ProjectUsers.Any(u => u.UserId == userId))
             .FirstOrDefaultAsync(comment => comment.Id == commentId);
     }
 

@@ -81,8 +81,10 @@ public class ProjectsController : ControllerBase
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
         var result = await _service.DeleteAsync(userId, projectId);
-        if (!result) return NotFound($"Couldn't find project {projectId}");
+        if (result == EntityStatus.NotFound) return NotFound($"Couldn't find project {projectId}");
+        if (result == EntityStatus.Forbidden) return Forbid();
+        if (result == EntityStatus.Deleted) return NoContent();
 
-        return NoContent();
+        return Problem("Something went wrong");
     }
 }

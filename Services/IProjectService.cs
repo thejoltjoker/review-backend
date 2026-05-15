@@ -9,5 +9,5 @@ public interface IProjectService
     Task<ProjectWithAssetsDto?> GetByIdAsync(string userId, string projectId);
     Task<ProjectDto> CreateAsync(string userId, CreateProjectDto data);
     Task<EntityStatus> UpdateAsync(string userId, string projectId, UpdateProjectDto data);
-    Task<bool> DeleteAsync(string userId, string projectId);
+    Task<EntityStatus> DeleteAsync(string userId, string projectId);
 }

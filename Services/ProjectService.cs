@@ -9,15 +9,20 @@ public class ProjectService : IProjectService
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IUserRepository _userRepository;
-
+    private readonly IProjectAuthorizationService _projectAuthorizationService;
     private readonly IMapper _mapper;
 
 
-    public ProjectService(IProjectRepository projectRepository, IUserRepository userRepository, IMapper mapper)
+    public ProjectService(
+            IProjectRepository projectRepository,
+            IUserRepository userRepository,
+            IProjectAuthorizationService projectAuthorizationService,
+            IMapper mapper)
         // TODO Improve error handling
     {
         _projectRepository = projectRepository;
         _userRepository = userRepository;
+        _projectAuthorizationService = projectAuthorizationService;
         _mapper = mapper;
     }
 
@@ -59,25 +64,28 @@ public class ProjectService : IProjectService
 
     public async Task<EntityStatus> UpdateAsync(string userId, string projectId, UpdateProjectDto data)
     {
-        // TODO Enforce role check (Owner/Editor) before allowing project updates.
         var existing = await _projectRepository.GetByIdForUserAsync(userId, projectId);
         if (existing == null) return EntityStatus.NotFound;
-        var projectUser = existing.ProjectUsers.FirstOrDefault(pu => pu.UserId == userId);
-        if (projectUser == null || !(projectUser.Role == ProjectUserRole.Owner || projectUser.Role == ProjectUserRole.Editor))
-            return EntityStatus.Forbidden;
+
+        var canUpdate = await _projectAuthorizationService.CanAsync(userId, projectId, ProjectPermission.Update);
+        if (!canUpdate) return EntityStatus.Forbidden;
+
         existing.Name = data.Name;
         _projectRepository.Update(existing);
         await _projectRepository.SaveAsync();
         return EntityStatus.Updated;
     }
 
-    public async Task<bool> DeleteAsync(string userId, string projectId)
+    public async Task<EntityStatus> DeleteAsync(string userId, string projectId)
     {
-        // TODO Enforce role check (Owner only) before allowing project deletion.
         var project = await _projectRepository.GetByIdForUserAsync(userId, projectId);
-        if (project == null) return false;
+        if (project == null) return EntityStatus.NotFound;
+
+        var canDelete = await _projectAuthorizationService.CanAsync(userId, projectId, ProjectPermission.Delete);
+        if (!canDelete) return EntityStatus.Forbidden;
+
         _projectRepository.Delete(project);
         await _projectRepository.SaveAsync();
-        return true;
+        return EntityStatus.Deleted;
     }
 }

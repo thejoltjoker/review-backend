@@ -7,55 +7,26 @@ public class ProjectAuthorizationService : IProjectAuthorizationService
 {
     private readonly IProjectRepository _projectRepository;
 
-    public List<ProjectPermission> GetPermissionFromRole(ProjectUserRole role)
+    private static readonly Dictionary<ProjectUserRole, HashSet<ProjectPermission>> RolePermissions = new()
     {
-        var permissions = new Dictionary<ProjectUserRole, List<ProjectPermission>>
-        {
-            [ProjectUserRole.Viewer] = [ProjectPermission.Read],
-            [ProjectUserRole.Editor] = [ProjectPermission.Read, ProjectPermission.Update],
-            [ProjectUserRole.Owner] = [ProjectPermission.Read, ProjectPermission.Update, ProjectPermission.Delete]
-        };
-        return permissions[role];
-    }
+        [ProjectUserRole.Viewer] = [ProjectPermission.Read],
+        [ProjectUserRole.Editor] = [ProjectPermission.Read, ProjectPermission.Update],
+        [ProjectUserRole.Owner] = [ProjectPermission.Read, ProjectPermission.Update, ProjectPermission.Delete]
+    };
 
     public ProjectAuthorizationService(IProjectRepository projectRepository)
     {
         _projectRepository = projectRepository;
     }
 
-    public async Task<bool> CanReadProjectAsync(string userId, string projectId)
+    public async Task<bool> CanAsync(string userId, string projectId, ProjectPermission permission)
     {
         var project = await _projectRepository.GetByIdForUserAsync(userId, projectId);
         if (project == null) return false;
-        var projectUser = project.ProjectUsers.FirstOrDefault(pu => pu.UserId == userId);
+
+        var projectUser = project.ProjectUsers.FirstOrDefault(user => user.UserId == userId);
         if (projectUser == null) return false;
-        if (GetPermissionFromRole(projectUser.Role).Contains(ProjectPermission.Read)) return true;
-        return false;
-    }
 
-    public bool CanUpdateProject(string userId, string projectId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool CanDeleteProject(string userId, string projectId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<bool> Can(string userId, string projectId, ProjectPermission action)
-    {
-        var project = await _projectRepository.GetByIdForUserAsync(userId, projectId);
-        if (project == null) return false;
-
-        var projectUser = project.ProjectUsers.FirstOrDefault(u => u.UserId == userId);
-
-        var permissions = new Dictionary<ProjectUserRole, List<ProjectPermission>>
-        {
-            [ProjectUserRole.Viewer] = [ProjectPermission.Read],
-            [ProjectUserRole.Editor] = [ProjectPermission.Read, ProjectPermission.Update],
-            [ProjectUserRole.Owner] = [ProjectPermission.Read, ProjectPermission.Update, ProjectPermission.Delete]
-        };
-        return permissions[projectUser!.Role].Contains(action);
+        return RolePermissions[projectUser.Role].Contains(permission);
     }
 }
