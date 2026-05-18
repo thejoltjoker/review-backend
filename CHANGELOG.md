@@ -34,6 +34,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#8](https://github.com/thejoltjoker/review-backend/pull/8)
 - Add `CreatedByUserId` to `Project` entity
   [#13](https://github.com/thejoltjoker/review-backend/pull/13)
+- Add Postman collection and environment files
+  [#16](https://github.com/thejoltjoker/review-backend/pull/16)
 
 ### Deprecated
 
