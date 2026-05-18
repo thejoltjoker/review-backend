@@ -61,6 +61,7 @@ public class AssetsController : ControllerBase
                 new { assetId = result.Asset?.Id },
                 result.Asset
             );
+        // TODO Map non-created outcomes to explicit status codes instead of generic 500.
         return Problem("Something went wrong");
     }
 
@@ -85,6 +86,7 @@ public class AssetsController : ControllerBase
             });
         }
 
+        // TODO Map unexpected status to a specific HTTP response instead of generic 500.
         return Problem("Something went wrong");
     }
 
@@ -100,6 +102,7 @@ public class AssetsController : ControllerBase
         // TODO Add more variation to error handling, i.e. unauthorized (because not project owner)
         if (result == EntityStatus.NotFound) return NotFound();
         if (result == EntityStatus.Deleted) return NoContent();
+        // TODO Do not return 204 for unknown failure states; return the matching error status.
         return NoContent();
     }
 }

@@ -45,6 +45,25 @@ ASP.NET Core Web API for an asset review system. The API uses Identity bearer au
 4. To use API key auth, send:
    - `Authorization: ApiKey <api-key-token>`
 
+## Run With Postman
+
+Use the provided Postman files to run the same end-to-end flow as `Review.Api.http`.
+
+1. Start the API locally (`dotnet run`).
+2. In Postman, import:
+   - `Review.Api.postman_collection.json`
+   - `Review.Api.postman_environment.json`
+3. Select the environment `Review API Local`.
+4. Update environment values for your setup:
+   - `baseUrl` (default: `http://localhost:5186`)
+   - `Email` and `Password`
+   - `OtherEmail` and `OtherPassword`
+5. Run the collection with Collection Runner from top to bottom.
+
+Notes:
+- Requests are ordered and chained by collection variables (tokens and IDs are captured automatically in test scripts).
+- If your local API runs on another port, only `baseUrl` needs to be changed.
+
 ---
 
 ## Assignment
