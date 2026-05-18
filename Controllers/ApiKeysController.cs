@@ -75,6 +75,7 @@ public class ApiKeysController : ControllerBase
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             var result = await _service.RevokeAsync(userId, keyId);
+            // TODO Return a specific status (e.g. 404/403) instead of generic 500 when revoke fails.
             if (!result) return Problem("Couldn't revoke api key");
             return NoContent();
         }

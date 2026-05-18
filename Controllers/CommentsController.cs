@@ -81,6 +81,7 @@ public class CommentsController : ControllerBase
             });
         }
 
+        // TODO Map unexpected status to a specific HTTP response instead of generic 500.
         return Problem("Something went wrong");
     }
 
@@ -95,6 +96,7 @@ public class CommentsController : ControllerBase
         var result = await _service.DeleteAsync(userId, commentId);
         if (result == EntityStatus.NotFound) return NotFound();
         if (result == EntityStatus.Deleted) return NoContent();
+        // TODO Do not return 204 for unknown failure states; return the matching error status.
         return NoContent();
     }
 }
