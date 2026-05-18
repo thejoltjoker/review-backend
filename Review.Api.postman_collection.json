@@ -699,6 +699,162 @@
       }
     },
     {
+      "name": "Asset validator 201 valid pair",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"createAssetValidPair201 status is 201\", function () {",
+              "  pm.response.to.have.status(201);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "ApiKey {{ApiKeyToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileName\": \"clip.mp4\",\n  \"fileUrl\": \"https://example.com/files/clip-validator-ok.mp4\",\n  \"fileType\": \"video/mp4\",\n  \"projectId\": \"{{ProjectId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/Assets"
+      }
+    },
+    {
+      "name": "Asset validator 400 mismatch pair",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"createAssetMismatchPair400 status is 400\", function () {",
+              "  pm.response.to.have.status(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "ApiKey {{ApiKeyToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileName\": \"clip.mp4\",\n  \"fileUrl\": \"https://example.com/files/clip-validator-mismatch.mp4\",\n  \"fileType\": \"image/png\",\n  \"projectId\": \"{{ProjectId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/Assets"
+      }
+    },
+    {
+      "name": "Asset validator 400 unsupported extension",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"createAssetUnsupportedExtension400 status is 400\", function () {",
+              "  pm.response.to.have.status(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "ApiKey {{ApiKeyToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileName\": \"clip.xyz\",\n  \"fileUrl\": \"https://example.com/files/clip-validator-unsupported.xyz\",\n  \"fileType\": \"application/octet-stream\",\n  \"projectId\": \"{{ProjectId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/Assets"
+      }
+    },
+    {
+      "name": "Asset validator 400 missing extension",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"createAssetMissingExtension400 status is 400\", function () {",
+              "  pm.response.to.have.status(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "ApiKey {{ApiKeyToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileName\": \"clip\",\n  \"fileUrl\": \"https://example.com/files/clip-validator-no-extension\",\n  \"fileType\": \"video/mp4\",\n  \"projectId\": \"{{ProjectId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/Assets"
+      }
+    },
+    {
       "name": "Status 401 list projects without auth",
       "event": [
         {
