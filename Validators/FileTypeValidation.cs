@@ -4,32 +4,44 @@ namespace Review.Api.Validators;
 
 public class FileTypeValidation : ValidationAttribute
 {
-    private readonly List<string> _allowedFileTypes =
-    [
-        "image/bmp",
-        "image/gif",
-        "image/jpeg",
-        "image/png",
-        "image/tiff",
-        "image/webp",
-        "video/avi",
-        "video/flv",
-        "video/mov",
-        "video/mp4",
-        "video/wmv"
-    ];
+    private readonly Dictionary<string, string> _allowedFileTypes = new()
+    {
+        { ".bmp", "image/bmp" },
+        { ".gif", "image/gif" },
+        { ".jpeg", "image/jpeg" },
+        { ".jpg", "image/jpeg" },
+        { ".png", "image/png" },
+        { ".tiff", "image/tiff" },
+        { ".webp", "image/webp" },
+        { ".avi", "video/avi" },
+        { ".flv", "video/flv" },
+        { ".mov", "video/mov" },
+        { ".mp4", "video/mp4" },
+        { ".wmv", "video/wmv" }
+    };
 
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         string? fileType = value as string;
-        if (fileType == null) return new ValidationResult("Filetype must not be null");
+        if (string.IsNullOrWhiteSpace(fileType))
+            return new ValidationResult("Filetype must not be empty");
 
+        var fileNameProp = validationContext.ObjectType.GetProperty("FileName");
+        string? fileName = fileNameProp?.GetValue(validationContext.ObjectInstance) as string;
 
-        var result = _allowedFileTypes.Contains(fileType);
-        return result
-            ? ValidationResult.Success
-            : new ValidationResult(
-                "Invalid FileType. Must be one of the following mime types: " +
-                string.Join(", ", _allowedFileTypes));
+        string fileExtension = Path.GetExtension(fileName)?.Trim().ToLowerInvariant() ?? string.Empty;
+        string normalizedFileType = fileType.Trim().ToLowerInvariant();
+
+        if (string.IsNullOrWhiteSpace(fileExtension))
+            return new ValidationResult("FileName must include a valid file extension.");
+
+        if (!_allowedFileTypes.TryGetValue(fileExtension, out var expectedFileType))
+            return new ValidationResult($"Unsupported file extension '{fileExtension}'.");
+
+        if (!string.Equals(normalizedFileType, expectedFileType, StringComparison.OrdinalIgnoreCase))
+            return new ValidationResult(
+                $"FileType '{fileType}' does not match extension '{fileExtension}'. Expected '{expectedFileType}'."
+            );
+        return ValidationResult.Success;
     }
 }
