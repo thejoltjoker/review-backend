@@ -23,6 +23,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#9](https://github.com/thejoltjoker/review-backend/pull/9)
 - Implement CRUD functionality for `Comment` entity
   [#11](https://github.com/thejoltjoker/review-backend/pull/11)
+- Add custom file type validation for `Asset` entity
+  [#18](https://github.com/thejoltjoker/review-backend/pull/18)
 
 ### Changed
 
