@@ -38,6 +38,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#13](https://github.com/thejoltjoker/review-backend/pull/13)
 - Add Postman collection and environment files
   [#16](https://github.com/thejoltjoker/review-backend/pull/16)
+- Allow users to see all assets in a project they're a member of
+  [#22](https://github.com/thejoltjoker/review-backend/pull/22)
 
 ### Deprecated
 

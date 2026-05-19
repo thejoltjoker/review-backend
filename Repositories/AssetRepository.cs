@@ -11,9 +11,10 @@ public class AssetRepository(ApplicationDbContext context) : IAssetRepository
 {
     private readonly ApplicationDbContext _context = context;
 
-    public async Task<List<Asset>> GetAllByUserIdAsync(string userId) =>
+    public async Task<List<Asset>> GetAllAccessibleByUserIdAsync(string userId) =>
         await _context.Assets.AsNoTracking()
-            .Where(asset => asset.UserId == userId)
+            .Where(asset => asset.Project != null &&
+                            asset.Project.Users.Any(user => user.Id == userId))
             .ToListAsync();
 
 
@@ -28,7 +29,10 @@ public class AssetRepository(ApplicationDbContext context) : IAssetRepository
     public async Task<Asset?> GetByIdAsync(string userId, string assetId) =>
         await _context.Assets
             .Include(asset => asset.Comments)
-            .FirstOrDefaultAsync(asset => asset.UserId == userId && asset.Id == assetId);
+            .Where(asset => asset.Id == assetId &&
+                            asset.Project != null &&
+                            asset.Project.Users.Any(u => u.Id == userId))
+            .FirstOrDefaultAsync();
 
 
     public async Task<Asset> AddAsync(Asset asset)
