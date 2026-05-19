@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Review.Api.Models;
 using Review.Api.Models.DTOs;
 using Review.Api.Services;
 
@@ -30,7 +30,6 @@ public class ApiKeysController : ControllerBase
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             var result = await _service.GetAllAsync(userId);
-            // if (result == null) return BadRequest("Project couldn't be created");
 
             return Ok(result);
         }
@@ -53,7 +52,6 @@ public class ApiKeysController : ControllerBase
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             var result = await _service.CreateAsync(userId, data.Name, DateTime.UtcNow.AddDays(90));
-            // if (result == null) return BadRequest("Project couldn't be created");
 
             // TODO Verify key is only visible once after creation.
             return Created(string.Empty, result);
@@ -75,9 +73,12 @@ public class ApiKeysController : ControllerBase
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
             var result = await _service.RevokeAsync(userId, keyId);
-            // TODO Return a specific status (e.g. 404/403) instead of generic 500 when revoke fails.
-            if (!result) return Problem("Couldn't revoke api key");
-            return NoContent();
+
+            if (result == EntityStatus.NotFound) return NotFound();
+            if (result == EntityStatus.Forbidden) return Forbid();
+            if (result == EntityStatus.Deleted) return NoContent();
+
+            return Problem("Something went wrong");
         }
         catch (Exception e)
         {

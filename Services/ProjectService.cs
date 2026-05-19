@@ -34,18 +34,18 @@ public class ProjectService : IProjectService
         return _mapper.Map<ProjectWithAssetsDto>(result);
     }
 
-    public async Task<ProjectDto> CreateAsync(string userId, CreateProjectDto data)
+    public async Task<(EntityStatus Status, ProjectDto? Project)> CreateAsync(string userId, CreateProjectDto data)
     {
         User? user = await _userRepository.GetByIdAsync(userId);
         // TODO Return EntityStatus instead of throwing
-        if (user == null) throw new KeyNotFoundException("User not found");
+        if (user == null) return (EntityStatus.NotFound, null);
 
         Project project = new(data.Name, userId);
         project.Users.Add(user);
 
         Project result = await _projectRepository.AddAsync(project);
         await _projectRepository.SaveAsync();
-        return _mapper.Map<ProjectDto>(result);
+        return (EntityStatus.Created, _mapper.Map<ProjectDto>(result));
     }
 
     public async Task<bool> UpdateAsync(string userId, string projectId, UpdateProjectDto data)

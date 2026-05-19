@@ -7,5 +7,5 @@ public interface IApiKeyService
 {
     Task<IEnumerable<ApiKeyDto>> GetAllAsync(string userId);
     Task<ApiKeyCreatedDto> CreateAsync(string userId, string? name, DateTime? expiresAt = null);
-    Task<bool> RevokeAsync(string userId, string keyId);
+    Task<EntityStatus> RevokeAsync(string userId, string keyId);
 }

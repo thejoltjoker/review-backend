@@ -42,13 +42,13 @@ public class ApiKeyService : IApiKeyService
         return response;
     }
 
-    public async Task<bool> RevokeAsync(string userId, string keyId)
+    public async Task<EntityStatus> RevokeAsync(string userId, string keyId)
     {
         var apiKey = await _apiKeyRepository.GetByKeyId(keyId);
-        if (apiKey == null) return false;
-        if (apiKey.UserId != userId) return false;
+        if (apiKey == null) return EntityStatus.NotFound;
+        if (apiKey.UserId != userId) return EntityStatus.Forbidden;
         _apiKeyRepository.Revoke(apiKey);
         await _apiKeyRepository.SaveAsync();
-        return true;
+        return EntityStatus.Deleted;
     }
 }
