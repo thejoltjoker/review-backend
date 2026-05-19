@@ -50,10 +50,14 @@ public class ProjectsController : ControllerBase
 
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
-        
-        var result = await _service.CreateAsync(userId, data);
 
-        return CreatedAtAction(nameof(GetById), new { projectId = result.Id }, result);
+        var result = await _service.CreateAsync(userId, data);
+        if (result.Status == EntityStatus.NotFound) return NotFound();
+        if (result.Status == EntityStatus.Created)
+            return CreatedAtAction(nameof(GetById), new { projectId = result.Project?.Id }, result.Project);
+
+        // TODO Map non-created outcomes to explicit status codes instead of generic 500.
+        return Problem("Something went wrong");
     }
 
     [HttpPut]

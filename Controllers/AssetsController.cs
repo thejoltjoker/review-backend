@@ -103,6 +103,6 @@ public class AssetsController : ControllerBase
         if (result == EntityStatus.NotFound) return NotFound();
         if (result == EntityStatus.Deleted) return NoContent();
         // TODO Do not return 204 for unknown failure states; return the matching error status.
-        return NoContent();
+        return Problem("Something went wrong");
     }
 }
