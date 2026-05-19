@@ -83,7 +83,7 @@ Detta projekt är startpunkten för din inlämingsuppgift. Ni behöver skapa ett
 
 #### API-nyckel
 
-- [ ] Efter registrering och inloggning ska användaren kunna begära en API-nyckel.
+- [x] Efter registrering och inloggning ska användaren kunna begära en API-nyckel.
 - [x] API-nyckeln ska sparas i databasen och kopplas till användaren.
 
 #### Skyddade API-slutpunkter med CRUD-funktionalitet
@@ -98,8 +98,8 @@ Detta projekt är startpunkten för din inlämingsuppgift. Ni behöver skapa ett
 
 #### Databas
 
-- [ ] Du väljer:
-  - [ ] Entity Framework + SQL
+- [x] Du väljer:
+  - [x] Entity Framework + SQL
 
 #### Betygsättning
 
@@ -111,17 +111,17 @@ Denna uppgift bedöms med IG (icke godkänd), G (godkänd) och VG (Väl Godkänt
 - [x] Användare kan begära och få en API-nyckel.
 - [x] CRUD-funktionalitet finns för vald resurs och är skyddad med API-nyckel.
 - [x] API-nyckeln valideras korrekt vid varje anrop.
-- [ ] Databasen fungerar enligt vald lösning (SQL med EF).
+- [x] Databasen fungerar enligt vald lösning (SQL med EF).
 - [x] Ni använder kontroller som endpoints och hanterar logiken i dessa.
-- [ ] Korrekta svarskoder skickas från ditt API.
+- [x] Korrekta svarskoder skickas från ditt API.
 
 ##### För Väl godkänt (VG) krävs:
 
-- [ ] Samtliga punkter från G
-- [ ] Ni har valt en komplex struktur av data att returnera och använder er av DTO:er för att begränsa informationen.
-- [ ] Ni använder designmönster med tjänster och repositories
-- [ ] Ni använder korrekt validering och har skapat minst en egen validering (custom validation).
-- [ ] En fungerande Swagger
+- [x] Samtliga punkter från G
+- [x] Ni har valt en komplex struktur av data att returnera och använder er av DTO:er för att begränsa informationen.
+- [x] Ni använder designmönster med tjänster och repositories
+- [x] Ni använder korrekt validering och har skapat minst en egen validering (custom validation).
+- [x] En fungerande Swagger
 
 #### Inlämning
 
