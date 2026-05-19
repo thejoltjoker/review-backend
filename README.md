@@ -2,6 +2,17 @@
 
 ASP.NET Core Web API for an asset review system. The API uses Identity bearer auth and API key auth for protected endpoints.
 
+## About the API
+
+- The API uses two auth mechanisms:
+  - Identity bearer token for login and API key management.
+  - API key (`Authorization: ApiKey <api-key-token>`) for protected resource access.
+- Projects use membership-based access:
+  - Project members can read and update project data.
+  - Only the project creator (`CreatedByUserId`) can delete a project.
+  - A delete attempt by a non-creator returns `403 Forbidden`.
+  - TODO: Add RBAC for project membership.
+
 ## Prerequisites
 
 - .NET 10 SDK
@@ -30,20 +41,75 @@ ASP.NET Core Web API for an asset review system. The API uses Identity bearer au
 
 ## Authentication Flow (Quick Start)
 
-1. Login (or register) using Identity endpoints:
-   - `POST /login`
-   - `POST /register`
-2. Create an API key with a bearer token:
-   - `POST /ApiKeys`
-   - `DELETE /ApiKeys/{keyId}`
-3. Access protected resources:
-   - `GET /Projects`
-   - `POST /Projects`
-   - `GET /Projects/{projectId}`
-   - `PUT /Projects/{projectId}`
-   - `DELETE /Projects/{projectId}`
-4. To use API key auth, send:
-   - `Authorization: ApiKey <api-key-token>`
+Use `http://localhost:5186` as `baseUrl` in the examples below.
+
+1. Register a user:
+
+```http
+POST /register
+Content-Type: application/json
+
+{
+  "email": "email@example.com",
+  "password": "password"
+}
+```
+
+2. Login and get bearer token (`accessToken` in response):
+
+```http
+POST /login
+Content-Type: application/json
+
+{
+  "email": "email@example.com",
+  "password": "password"
+}
+```
+
+3. Create an API key (requires bearer token):
+
+```http
+POST /ApiKeys
+Authorization: Bearer <access-token>
+Content-Type: application/json
+
+{
+  "name": "my-first-key"
+}
+```
+
+4. Use protected CRUD endpoints with API key:
+
+```http
+GET /Projects
+Authorization: ApiKey <api-key-token>
+```
+
+```http
+POST /Projects
+Authorization: ApiKey <api-key-token>
+Content-Type: application/json
+
+{
+  "name": "My Project"
+}
+```
+
+```http
+PUT /Projects/{projectId}
+Authorization: ApiKey <api-key-token>
+Content-Type: application/json
+
+{
+  "name": "My Updated Project"
+}
+```
+
+```http
+DELETE /Projects/{projectId}
+Authorization: ApiKey <api-key-token>
+```
 
 ## Run With Postman
 
@@ -61,6 +127,7 @@ Use the provided Postman files to run the same end-to-end flow as `Review.Api.ht
 5. Run the collection with Collection Runner from top to bottom.
 
 Notes:
+
 - Requests are ordered and chained by collection variables (tokens and IDs are captured automatically in test scripts).
 - If your local API runs on another port, only `baseUrl` needs to be changed.
 
@@ -127,6 +194,6 @@ Denna uppgift bedöms med IG (icke godkänd), G (godkänd) och VG (Väl Godkänt
 
 - [ ] En länk till ett GitHub-repo på itslearning
 - [ ] Bifoga en README.md som beskriver:
-  - [ ] Hur projektet startas.
-  - [ ] Hur man registrerar en användare och får en API-nyckel.
-  - [ ] Exempel på anrop till de skyddade CRUD-slutpunkterna.
+  - [x] Hur projektet startas.
+  - [x] Hur man registrerar en användare och får en API-nyckel.
+  - [x] Exempel på anrop till de skyddade CRUD-slutpunkterna.

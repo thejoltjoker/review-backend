@@ -58,13 +58,14 @@ public class ProjectService : IProjectService
         return true;
     }
 
-    public async Task<bool> DeleteAsync(string userId, string projectId)
+    public async Task<EntityStatus> DeleteAsync(string userId, string projectId)
     {
         // TODO Enforce that only the owner tied to the validated API key can delete this project.
         var project = await _projectRepository.GetByIdForUserAsync(userId, projectId);
-        if (project == null) return false;
+        if (project == null) return EntityStatus.NotFound;
+        if (project.CreatedByUserId != userId) return EntityStatus.Forbidden;
         _projectRepository.Delete(project);
         await _projectRepository.SaveAsync();
-        return true;
+        return EntityStatus.Deleted;
     }
 }

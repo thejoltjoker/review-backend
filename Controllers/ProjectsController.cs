@@ -83,8 +83,11 @@ public class ProjectsController : ControllerBase
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
         var result = await _service.DeleteAsync(userId, projectId);
-        if (!result) return NotFound($"Couldn't find project {projectId}");
+        if (result == EntityStatus.NotFound) return NotFound();
+        if (result == EntityStatus.Forbidden) return Forbid();
+        if (result == EntityStatus.Deleted) return NoContent();
 
-        return NoContent();
+        // TODO Map unexpected status to a specific HTTP response instead of generic 500.
+        return Problem("Something went wrong");
     }
 }

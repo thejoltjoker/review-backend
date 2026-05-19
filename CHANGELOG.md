@@ -40,6 +40,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
   [#16](https://github.com/thejoltjoker/review-backend/pull/16)
 - Allow users to see all assets in a project they're a member of
   [#22](https://github.com/thejoltjoker/review-backend/pull/22)
+- Only allow project creator to delete a project
+  [#23](https://github.com/thejoltjoker/review-backend/pull/23)
 
 ### Deprecated
 
