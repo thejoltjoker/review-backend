@@ -49,7 +49,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- <!-- Bug fixes -->
+- Return correct status codes for all endpoints
+  [#20](https://github.com/thejoltjoker/review-backend/pull/20)
 
 ### Security
 
