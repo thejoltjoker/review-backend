@@ -54,10 +54,13 @@ public class CommentsController : ControllerBase
 
         var result = await _service.CreateAsync(userId, data);
         if (result.Status == EntityStatus.InvalidReference)
+        {
             return UnprocessableEntity(new
             {
                 message = "Referenced asset does not exist or is inaccessible."
             });
+        }
+
         if (result.Status == EntityStatus.Created)
             return CreatedAtAction(
                 nameof(GetById),
@@ -80,13 +83,6 @@ public class CommentsController : ControllerBase
         if (result == EntityStatus.Updated || result == EntityStatus.NoChanges) return NoContent();
         if (result == EntityStatus.NotFound) return NotFound();
         if (result == EntityStatus.Forbidden) return Forbid();
-        if (result == EntityStatus.InvalidReference)
-        {
-            return UnprocessableEntity(new
-            {
-                message = "Referenced entity does not exist or is inaccessible."
-            });
-        }
 
         // TODO Map unexpected status to a specific HTTP response instead of generic 500.
         return Problem("Something went wrong");
@@ -104,7 +100,8 @@ public class CommentsController : ControllerBase
         if (result == EntityStatus.NotFound) return NotFound();
         if (result == EntityStatus.Deleted) return NoContent();
         if (result == EntityStatus.Forbidden) return Forbid();
-        // TODO Do not return 204 for unknown failure states; return the matching error status.
+
+        // TODO Map unexpected status to a specific HTTP response instead of generic 500.
         return Problem("Something went wrong");
     }
 }

@@ -25,7 +25,6 @@ public class CommentService : ICommentService
 
     public async Task<IEnumerable<CommentDto>> GetAllByAssetIdAsync(string userId, string assetId)
     {
-        // TODO Add error handling
         var result = await _repository.GetAllByAssetIdAsync(userId, assetId);
         return _mapper.Map<IEnumerable<CommentDto>>(result);
     }

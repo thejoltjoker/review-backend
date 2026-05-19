@@ -54,7 +54,14 @@ public class AssetsController : ControllerBase
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
         var result = await _service.CreateAsync(userId, data);
-        if (result.Status == EntityStatus.InvalidReference) return NotFound();
+        if (result.Status == EntityStatus.InvalidReference)
+        {
+            return UnprocessableEntity(new
+            {
+                message = "Referenced project does not exist or is inaccessible."
+            });
+        }
+
         if (result.Status == EntityStatus.Created)
             return CreatedAtAction(
                 nameof(GetById),
@@ -99,7 +106,7 @@ public class AssetsController : ControllerBase
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
         var result = await _service.DeleteAsync(userId, assetId);
-        // TODO Add more variation to error handling, i.e. unauthorized (because not project owner)
+
         if (result == EntityStatus.NotFound) return NotFound();
         if (result == EntityStatus.Deleted) return NoContent();
         // TODO Do not return 204 for unknown failure states; return the matching error status.
