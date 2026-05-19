@@ -661,6 +661,32 @@ Authorization: ApiKey {{ApiKeyToken}}
 ###
 
 ### Revoke API key (requires bearer token)
+# @name revokeMissingApiKey404
+DELETE {{Review_Api_HostAddress}}/ApiKeys/KEY00000-0000-0000-0000-000000000000
+Authorization: Bearer {{BearerToken}}
+
+> {%
+  client.test("revokeMissingApiKey404 status is 404", function () {
+    client.assert(response.status === 404, "Expected 404 Not Found");
+  });
+%}
+
+###
+
+### Status coverage: 403 (forbidden) - other user revokes your API key
+# @name revokeApiKeyCrossUser403
+DELETE {{Review_Api_HostAddress}}/ApiKeys/{{ApiKeyId}}
+Authorization: Bearer {{OtherBearerToken}}
+
+> {%
+  client.test("revokeApiKeyCrossUser403 status is 403", function () {
+    client.assert(response.status === 403, "Expected 403 Forbidden");
+  });
+%}
+
+###
+
+### Revoke API key (requires bearer token)
 # @name revokeApiKey
 DELETE {{Review_Api_HostAddress}}/ApiKeys/{{ApiKeyId}}
 Authorization: Bearer {{BearerToken}}

@@ -1383,6 +1383,58 @@
       }
     },
     {
+      "name": "Status 404 revoke missing API key",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"revokeMissingApiKey404 status is 404\", function () {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{BearerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/ApiKeys/KEY00000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "name": "Status 403 revoke API key as other user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"revokeApiKeyCrossUser403 status is 403\", function () {",
+              "  pm.response.to.have.status(403);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{OtherBearerToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/ApiKeys/{{ApiKeyId}}"
+      }
+    },
+    {
       "name": "Revoke API key",
       "event": [
         {
