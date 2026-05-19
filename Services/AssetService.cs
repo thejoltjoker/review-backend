@@ -23,7 +23,7 @@ public class AssetService : IAssetService
 
     public async Task<IEnumerable<AssetDto>> GetAllAsync(string userId)
     {
-        List<Asset> result = await _repository.GetAllByUserIdAsync(userId);
+        List<Asset> result = await _repository.GetAllAccessibleByUserIdAsync(userId);
         return _mapper.Map<IEnumerable<AssetDto>>(result);
     }
 
@@ -37,7 +37,7 @@ public class AssetService : IAssetService
     {
         bool hasAccess = await _projectRepository.ExistsForUserAsync(userId, data.ProjectId);
         if (!hasAccess) return (EntityStatus.InvalidReference, null);
-        
+
         var asset = _mapper.Map<Asset>(data);
         asset.UserId = userId;
         await _repository.AddAsync(asset);

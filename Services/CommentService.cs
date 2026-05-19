@@ -36,13 +36,17 @@ public class CommentService : ICommentService
         return _mapper.Map<CommentDto>(comment);
     }
 
-    public async Task<CommentDto> CreateAsync(string userId, CreateCommentDto data)
+    public async Task<(EntityStatus Status, CommentDto? Comment)> CreateAsync(string userId, CreateCommentDto data)
     {
+        var asset = await _assetRepository.GetByIdAsync(userId, data.AssetId);
+        if (asset == null) return (EntityStatus.InvalidReference, null);
+
+
         Comment comment = _mapper.Map<Comment>(data);
         comment.UserId = userId;
         await _repository.AddAsync(comment);
         await _repository.SaveAsync();
-        return _mapper.Map<CommentDto>(comment);
+        return (EntityStatus.Created, _mapper.Map<CommentDto>(comment));
     }
 
     public async Task<EntityStatus> UpdateAsync(string userId, string commentId, UpdateCommentDto data)
@@ -59,13 +63,13 @@ public class CommentService : ICommentService
             hasChanges = true;
         }
 
-        
+
         if (Math.Abs(data.TimestampSeconds - comment.TimestampSeconds) > 0.001f)
         {
             comment.TimestampSeconds = data.TimestampSeconds;
             hasChanges = true;
         }
-        
+
         if (!hasChanges) return EntityStatus.NoChanges;
 
         _repository.Update(comment);
@@ -77,6 +81,7 @@ public class CommentService : ICommentService
     {
         var comment = await _repository.GetByIdAsync(userId, commentId);
         if (comment == null) return EntityStatus.NotFound;
+        if (comment.UserId != userId) return EntityStatus.Forbidden;
         _repository.Delete(comment);
         await _repository.SaveAsync();
         return EntityStatus.Deleted;

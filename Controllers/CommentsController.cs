@@ -52,12 +52,19 @@ public class CommentsController : ControllerBase
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-        CommentDto result = await _service.CreateAsync(userId, data);
-        return CreatedAtAction(
-            nameof(GetById),
-            new { commentId = result.Id },
-            result
-        );
+        var result = await _service.CreateAsync(userId, data);
+        if (result.Status == EntityStatus.InvalidReference)
+            return UnprocessableEntity(new
+            {
+                message = "Referenced asset does not exist or is inaccessible."
+            });
+        if (result.Status == EntityStatus.Created)
+            return CreatedAtAction(
+                nameof(GetById),
+                new { commentId = result.Comment?.Id },
+                result.Comment
+            );
+        return Problem("Something went wrong");
     }
 
     [HttpPut]
@@ -96,6 +103,7 @@ public class CommentsController : ControllerBase
         var result = await _service.DeleteAsync(userId, commentId);
         if (result == EntityStatus.NotFound) return NotFound();
         if (result == EntityStatus.Deleted) return NoContent();
+        if (result == EntityStatus.Forbidden) return Forbid();
         // TODO Do not return 204 for unknown failure states; return the matching error status.
         return Problem("Something went wrong");
     }
